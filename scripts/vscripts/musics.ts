@@ -1,8 +1,10 @@
+export interface NoteData {
+    Time: number;
+    LaneId: number;
+}
+
 export interface Chart {
-    NoteDataList: {
-        Time: number;
-        LaneId: number;
-    }[];
+    NoteDataList: NoteData[];
     BarLineList: number[];
 }
 

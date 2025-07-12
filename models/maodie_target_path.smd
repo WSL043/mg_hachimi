@@ -1,0 +1,15 @@
+// Exported with Source Maya Tools
+// Scene: 'F:\SteamLibrary\steamapps\common\Counter-Strike Global Offensive\content\csgo_addons\mg_hachimi\models\maodie_target_src.mb'
+version 1
+nodes
+0 "tag.origin" -1
+1 "tag.target" 0
+end
+skeleton
+time 0
+0  0.000000 0.000000 0.000000  0.000000 -0.000000 0.000000
+1  0.000000 0.000000 0.000000  0.000000 -0.000000 0.000000
+time 1
+0  0.000000 0.000000 0.000000  0.000000 -0.000000 0.000000
+1  -1351.6422 0.000000 -418.3654  0.000000 -0.000000 0.000000
+end

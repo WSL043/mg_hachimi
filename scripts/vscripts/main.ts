@@ -11,7 +11,6 @@ Instance.PublicMethod("HachimiInit", (suffix: string) => {
         return;
     }
 
-    inst.templateSuffix = parseInt(suffix) + 1;
     inst.postInit();
     inst.updateMusic();
 });
@@ -23,25 +22,6 @@ Instance.PublicMethod("HachimiStart", () => {
     }
 
     inst.start();
-});
-
-Instance.PublicMethod("HachimiTargetKilled", (paramsJson: string) => {
-    const inst = HachimiGame.instance;
-    if (!inst) {
-        return;
-    }
-
-    const [suffix, where] = JSON.parse(paramsJson) as number[];
-    inst.onTargetKilled(suffix, where);
-});
-
-Instance.PublicMethod("HachimiTargetSpawned", (suffix: string) => {
-    const inst = HachimiGame.instance;
-    if (!inst) {
-        return;
-    }
-
-    inst.onTargetSpawned(suffix);
 });
 
 Instance.PublicMethod("HachimiMusicPrev", () => {
@@ -258,6 +238,10 @@ game.on('round_start', () => {
     Instance.EntFireAtName("stop_button", "Alpha", 0);
 
     updateSpeedUI(inst);
+    inst.postInit();
+});
+
+game.on('round_poststart', () => {
 });
 
 // simple timescale cheat detection

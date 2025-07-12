@@ -1,0 +1,217 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc39:version{1ceecb0d-4093-4729-ab18-b76886c64cde} -->
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "o"
+						children = 
+						[
+							{
+								_class = "ReplaceMeshMaterials"
+								remaps = 
+								[
+									{
+										from = "materials/hachimi/maodie/maodie_1_nml.vmat"
+										to = "materials/hachimi/maodie/maodie_1_o.vmat"
+									},
+									{
+										from = "materials/hachimi/maodie/maodie_1_ha.vmat"
+										to = "materials/hachimi/maodie/maodie_1_o.vmat"
+									},
+									{
+										from = "materials/hachimi/maodie/maodie_1_o.vmat"
+										to = "materials/hachimi/maodie/maodie_1_o.vmat"
+									},
+								]
+								use_single_material = false
+								single_override_material = ""
+							},
+						]
+						filename = "models/maodie_target.fbx"
+						import_scale = 1.0
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = 
+							[
+								"mesh_141",
+								"mesh_157",
+							]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "nml"
+						children = 
+						[
+							{
+								_class = "ReplaceMeshMaterials"
+								remaps = 
+								[
+									{
+										from = "materials/hachimi/maodie/maodie_1_nml.vmat"
+										to = "materials/hachimi/maodie/maodie_1_nml.vmat"
+									},
+									{
+										from = "materials/hachimi/maodie/maodie_1_ha.vmat"
+										to = "materials/hachimi/maodie/maodie_1_nml.vmat"
+									},
+									{
+										from = "materials/hachimi/maodie/maodie_1_o.vmat"
+										to = "materials/hachimi/maodie/maodie_1_nml.vmat"
+									},
+								]
+								use_single_material = false
+								single_override_material = ""
+							},
+						]
+						filename = "models/maodie_target.fbx"
+						import_scale = 1.0
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = 
+							[
+								"mesh_141",
+								"mesh_157",
+							]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "ha"
+						children = 
+						[
+							{
+								_class = "ReplaceMeshMaterials"
+								remaps = 
+								[
+									{
+										from = "materials/hachimi/maodie/maodie_1_nml.vmat"
+										to = "materials/hachimi/maodie/maodie_1_ha.vmat"
+									},
+									{
+										from = "materials/hachimi/maodie/maodie_1_ha.vmat"
+										to = "materials/hachimi/maodie/maodie_1_ha.vmat"
+									},
+									{
+										from = "materials/hachimi/maodie/maodie_1_o.vmat"
+										to = "materials/hachimi/maodie/maodie_1_ha.vmat"
+									},
+								]
+								use_single_material = false
+								single_override_material = ""
+							},
+						]
+						filename = "models/maodie_target.fbx"
+						import_scale = 1.0
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = 
+							[
+								"mesh_141",
+								"mesh_157",
+							]
+						}
+					},
+				]
+			},
+			{
+				_class = "AnimationList"
+				children = 
+				[
+					{
+						_class = "AnimFile"
+						name = "idle"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						animgraph_additive = false
+						source_filename = "models/maodie_target_path.smd"
+						import_bone_scales = false
+						start_frame = -1
+						end_frame = 0
+						framerate = -1.0
+						reverse = false
+					},
+				]
+				default_root_bone_name = ""
+			},
+			{
+				_class = "PhysicsShapeList"
+				children = 
+				[
+					{
+						_class = "PhysicsShapeBox"
+						name = "hit_head"
+						parent_bone = "tag_target"
+						surface_prop = "Wood"
+						collision_prop = "default"
+						tool_material = ""
+						origin = [ 73.851486, 3.407587, 4.51002 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						dimensions = [ 19.533337, 19.783026, 1.4075 ]
+					},
+				]
+				leave_body_collision_unmodified = false
+			},
+			{
+				_class = "BodyGroupList"
+				children = 
+				[
+					{
+						_class = "BodyGroup"
+						name = "maodie"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								meshes = 
+								[
+									"o",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								meshes = 
+								[
+									"nml",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								meshes = 
+								[
+									"ha",
+								]
+							},
+						]
+						hidden_in_tools = false
+						non_bodygroup_single_choice = false
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = "models/maodie_target_still.vanmgrph"
+		document_sub_type = "ModelDocSubType_None"
+	}
+}
