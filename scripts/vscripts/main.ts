@@ -72,6 +72,7 @@ Instance.PublicMethod("HachimiGreenNumAddStop", () => {
 });
 
 let currentMusic: Music = null!;
+let offset = 0.0;
 
 Instance.PublicMethod("Music_Begin", () => {
     currentMusic = {
@@ -85,6 +86,8 @@ Instance.PublicMethod("Music_Begin", () => {
             NoteDataList: [],
         }
     };
+
+    offset = 0;
 
     Instance.Msg("Clear currentMusic");
 });
@@ -106,13 +109,17 @@ Instance.PublicMethod("Music_SetCover", (cover: string) => {
 });
 
 Instance.PublicMethod("Music_SetBarLines", (barLines: string) => {
-    currentMusic.chart.BarLineList = JSON.parse(barLines);
+    currentMusic.chart.BarLineList = (JSON.parse(barLines) as number[]).map(v => v + offset);
+});
+
+Instance.PublicMethod("Music_SetOffset", (offsetStr: string) => {
+    offset = parseInt(offsetStr);
 });
 
 Instance.PublicMethod("Music_AddNote", (note: string) => {
     const [LaneId, Time] = JSON.parse(note) as number[];
 
-    currentMusic.chart.NoteDataList.push({ LaneId, Time });
+    currentMusic.chart.NoteDataList.push({ LaneId, Time: Time + offset });
 });
 
 Instance.PublicMethod("Music_SetSort", (sort: number) => {
@@ -241,9 +248,6 @@ game.on('round_start', () => {
     inst.postInit();
 });
 
-game.on('round_poststart', () => {
-});
-
 // simple timescale cheat detection
 let lastTimeReal = 0;
 let lastTimeGame = 0;
@@ -277,4 +281,11 @@ runServerCommand("mp_maxmoney 65535");
 runServerCommand("mp_startmoney 65535");
 runServerCommand("mp_buytime 65535");
 runServerCommand("weapon_accuracy_nospread 1");
-runServerCommand("vis_enable 0");
+
+let spread = false;
+Instance.PublicMethod("ToggleWeaponSpread", () => {
+    spread = !spread;
+
+    runServerCommand("weapon_accuracy_nospread " + (spread ? '0' : '1'));
+    Instance.EntFireAtName("weapon_spread_display", "SetMessage", spread ? 'ON' : 'OFF');
+});

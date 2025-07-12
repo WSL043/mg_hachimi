@@ -17,7 +17,7 @@ const LANE_START = 1929;
 const LANE_HEIGHT = 740;
 const LEFT_LANE = 896;
 const SPACE = 64;
-export const JUDGE_POINT = 0.914;
+export const JUDGE_POINT = 0.93;
 
 function setAnimgraphParam(targetname: string, paramName: string, param: number | boolean | string) {
     runServerCommand(`ent_animgraph_setvar ${paramName}=${param} ${targetname}`);

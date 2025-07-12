@@ -216,15 +216,13 @@ export class HachimiGame {
         note.addFrame({
             time: noteTime,
             progress: JUDGE_POINT,
-            callback: () => {
-                this.haEffect.play();
-            }
         });
 
         note.addFrame({
             time: noteTime + C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
             progress: 1,
             callback: () => {
+                this.haEffect.play();
                 this.processKilledTarget({
                     index: noteIndex,
                     where: 2,
@@ -430,7 +428,7 @@ export class HachimiGame {
         const note = this.chart.NoteDataList[index];
         const lastNoteTime = this.lastNoteTimes.get(index);
 
-        const offset = note.Time - this.time + 0.016;
+        const offset = note.Time - this.time;
 
         if (offset > C.JUDGE_RANGE_SETS[this.judgeOption].POOR) {
             return false;
@@ -533,6 +531,10 @@ export class HachimiGame {
 
         this.noteProgress++;
 
+        if (judgement > 2) {
+            return false;
+        }
+        
         return true;
     }
 

@@ -144,6 +144,54 @@
 		vsnd_files = "sounds/songs/huoquanjia.vsnd"
 	}
 
+	"music.chouxiang" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/ChouXiang.vsnd"
+	}
+
+	"music.hachi_xiang" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/hachi_xiang.vsnd"
+	}
+
+	"music.the_feeling" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/the_feeling.vsnd"
+	}
+
+	"music.otto_haruhikage" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 1.0
+		vsnd_files = "sounds/songs/otto_haruhikage.vsnd"
+	}
+
+	"music.manbo_your_body" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/manbo_your_body.vsnd"
+	}
+
+	"music.hachimi_new_rules" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/hachimi_new_rules.vsnd"
+	}
+
 	"effect.maodie_ha" =
 	{
 		type = "csgo_music"

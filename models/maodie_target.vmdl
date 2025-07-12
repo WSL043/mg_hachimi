@@ -113,9 +113,9 @@
 						surface_prop = "Wood"
 						collision_prop = "default"
 						tool_material = ""
-						origin = [ 32.078045, 0.526847, 4.51002 ]
+						origin = [ 32.078045, 0.200419, 4.51002 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						dimensions = [ 63.977692, 72.237411, 1.4075 ]
+						dimensions = [ 63.977692, 88.295769, 1.4075 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -124,9 +124,9 @@
 						surface_prop = "Wood"
 						collision_prop = "default"
 						tool_material = ""
-						origin = [ 79.842216, -21.038345, 4.51002 ]
+						origin = [ 76.294289, -25.173943, 4.51002 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						dimensions = [ 31.712889, 29.139179, 1.4075 ]
+						dimensions = [ 24.617039, 37.410374, 1.4075 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -135,9 +135,9 @@
 						surface_prop = "Wood"
 						collision_prop = "default"
 						tool_material = ""
-						origin = [ 79.843445, 24.937935, 4.51002 ]
+						origin = [ 76.212349, 28.895416, 4.51002 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						dimensions = [ 31.71534, 23.365849, 1.4075 ]
+						dimensions = [ 24.453159, 31.280811, 1.4075 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -146,9 +146,9 @@
 						surface_prop = "Wood"
 						collision_prop = "default"
 						tool_material = ""
-						origin = [ 89.627701, 3.398202, 4.51002 ]
+						origin = [ 86.011627, 3.398202, 4.51002 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						dimensions = [ 12.047945, 19.866627, 1.4075 ]
+						dimensions = [ 4.815789, 19.866627, 1.4075 ]
 					},
 				]
 				leave_body_collision_unmodified = false
