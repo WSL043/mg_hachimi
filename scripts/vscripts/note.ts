@@ -245,7 +245,7 @@ export class Note {
         const ratio = timediff ? (time - frame.time) / (nextframe.time - frame.time) : 0;
         const additive = (nextframe.progress! - frame.progress!) * ratio;
 
-        this.positon = frame.progress! + additive;
+        this.positon = Math.min(Math.max(frame.progress! + additive, 0), 1);
     }
 }
 

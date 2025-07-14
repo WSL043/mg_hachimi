@@ -6,7 +6,7 @@ import { C, JudgeOpt, Opt } from "./constants";
 import { SoundEffect, createSoundEvent } from "./sound";
 import { JudgeTipController } from "./judge_tip_controller";
 import { HitmarkerController } from "./hitmarker_controller";
-import { JUDGE_POINT, Note, NotePool } from "./note";
+import { Frame, JUDGE_POINT, Note, NotePool } from "./note";
 
 function prependSpace(value: { toString: () => string }, count: number = 12) {
     return value.toString().padStart(count, ' ');
@@ -40,6 +40,8 @@ export class HachimiGame {
 
     applyChartOptions() {
         this._moddedChart = JSON.parse(JSON.stringify(this.music.chart)) as Chart;
+        this._moddedChart.NoteDataList = this._moddedChart.NoteDataList.sort((a, b) => a.Time - b.Time);
+        this._moddedChart.SoflanDataList = this._moddedChart.SoflanDataList.sort((a, b) => b.Time - a.Time);
 
         if (!this.option) {
             return;
@@ -93,7 +95,16 @@ export class HachimiGame {
             throw new Error("using chart before apply options.");
         }
 
+
         return this._moddedChart;
+    }
+
+    get notes() {
+        return this.chart.NoteDataList;
+    }
+
+    get soflans() {
+        return this.chart.SoflanDataList;
     }
 
     get musicName() {
@@ -111,7 +122,7 @@ export class HachimiGame {
 
     killedObjects: { index: number, where: number, note: Note }[] = [];
     lastNoteTimes = new Map<number, number>();
-    notes: Note[] = [];
+    noteObjs: Note[] = [];
 
     lastTime = 0;
 
@@ -191,57 +202,135 @@ export class HachimiGame {
         }
 
         const note = this._pool.rent(spawnPoint);
-        this.notes.push(note);
+        const playerSpeed = JUDGE_POINT / this.trackTime;
 
-        note.addFrame({
-            time: noteTime - this.trackTime - C.WAIT_TIME,
-            isUp: false,
-            bodygroup: 0,
+        let time = noteTime;
+        let progress = JUDGE_POINT;
+
+        // Generate all frames until first soflan data
+        // soflan data is ordered in descending
+        const frames: Frame[] = [];
+
+        for (let i = this.soflans.findIndex(s => s.Time < noteTime); i < this.soflans.length; i++) {
+            frames.push({
+                time,
+                progress,
+            });
+
+            const soflanData = this.soflans[i];
+            let speed = playerSpeed * soflanData.Speed;
+
+            progress -= speed * (time - soflanData.Time);
+            time = soflanData.Time;
+        }
+
+        frames.push({
+            time,
+            progress,
         });
 
-        note.addFrame({
-            time: noteTime - this.trackTime,
-            progress: 0,
-            isUp: true,
-            callback: () => {
-                note.show();
+        frames.sort((a, b) => a.time - b.time);
+        const strippedFrames: Frame[] = [];
+
+        // find the first appear time (progress in [0, 1]) from generated frames
+        for (let i = 0; i < frames.length - 1; i++) {
+            const f1 = frames[i];
+            const f2 = frames[i + 1];
+
+            const p1 = f1.progress!;
+            const p2 = f2.progress!;
+
+            const s = p2 - p1;
+            const t = f2.time - f1.time;
+
+            if (p1 < 0 && p2 > 0) {
+                strippedFrames.push({
+                    time: f1.time + ((0 - p1) / s) * t,
+                    progress: 0,
+                });
+            } else if (p1 > 1 && p2 < 1) {
+                strippedFrames.push({
+                    time: f1.time + ((1 - p1) / s) * t,
+                    progress: 1,
+                });
+            } else {
+                continue;
             }
-        });
 
-        note.addFrame({
-            time: noteTime - C.JUDGE_RANGE_SETS[this.judgeOption].GOOD,
-            bodygroup: 2,
-        });
+            strippedFrames.push(...frames.slice(i + 1));
+            break;
+        }
 
-        note.addFrame({
-            time: noteTime,
-            progress: JUDGE_POINT,
-        });
+        // generate additional frames
+        for (let i = strippedFrames.length - 2; i >= 0; i--) {
+            const f1 = strippedFrames[i];
+            const f2 = strippedFrames[i + 1];
+            const p1 = f1.progress!;
+            const p2 = f2.progress!;
 
-        note.addFrame({
-            time: noteTime + C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
-            progress: 1,
-            callback: () => {
-                this.haEffect.play();
-                this.processKilledTarget({
-                    index: noteIndex,
-                    where: 2,
-                    note
+            const s = p2 - p1;
+            const t = f2.time - f1.time;
+            const v = s / t;
+
+            // show
+            if (p1 <= 0 && p2 > 0) {
+                strippedFrames.push({
+                    time: f1.time + ((0 - p1) / s) * t - C.WAIT_TIME,
+                    isUp: true,
+                    callback: () => {
+                        note.show();
+                    },
                 });
             }
-        });
 
+            if (p1 >= 1 && p2 < 1) {
+                strippedFrames.push({
+                    time: f1.time + ((1 - p1) / s) * t - C.WAIT_TIME,
+                    isUp: true,
+                    callback: () => {
+                        note.show();
+                    },
+                });
+            }
+
+            if (f2.time == noteTime) {
+                // stop
+                strippedFrames.push({
+                    time: f2.time + C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
+                    progress: p2 + v * C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
+                    callback: () => {
+                        this.haEffect.play();
+                        this.processKilledTarget({
+                            index: noteIndex,
+                            where: 2,
+                            note
+                        });
+                    }
+                });
+
+                // change material
+                note.addFrame({
+                    time: noteTime - C.JUDGE_RANGE_SETS[this.judgeOption].GOOD,
+                    bodygroup: 2,
+                });
+            }
+        }
+
+        Instance.Msg(JSON.stringify(strippedFrames));
+
+        strippedFrames.forEach(f => note.addFrame(f));
         note.setupFrames();
-
         note.onhit = (where: number) => {
             this.onTargetKilled(noteIndex, where, note);
         };
+
+        this.noteObjs.push(note);
     }
 
     onTick() {
-        this.notes.forEach(v => v.onTick(this.time));
         this.processKilledTargets();
 
+        this.noteObjs.forEach(v => v.onTick(this.time));
         this.judgeTipControllers.forEach(v => v.onTick());
         this.hitmarkerController.onTick();
         this.headshotHitmarkerController.onTick();
@@ -251,7 +340,7 @@ export class HachimiGame {
         }
 
         const musicTime = this.time;
-        const notes = this.chart.NoteDataList;
+        const notes = this.notes;
 
         if (musicTime > 0 && !this.musicStarted) {
             this.musicStarted = true;
@@ -269,7 +358,7 @@ export class HachimiGame {
 
             this.spawnMaodie(note.LaneId, note.Time, i);
             this.lastNoteIndex++;
-        }
+        } 1
 
         if (this.lastNoteIndex >= notes.length) {
             this.stop(true);
@@ -290,8 +379,8 @@ export class HachimiGame {
             Instance.EntFireBroadcast('maodie_sound_player', 'StopSound');
             Instance.EntFireBroadcast('maodie_sound_player', 'Kill');
 
-            this.notes.forEach(v => this._pool.returnNote(v));
-            this.notes = [];
+            this.noteObjs.forEach(v => this._pool.returnNote(v));
+            this.noteObjs = [];
 
             this.hardStopped = true;
         }
@@ -356,12 +445,10 @@ export class HachimiGame {
 
         this.clearStatus();
 
-        this.chart.NoteDataList = this.chart.NoteDataList.sort((a, b) => a.Time - b.Time);
-
         this.lastNoteTimes.clear();
         const lastLaneNoteTimes = [-1, -1, -1, -1, -1, -1, -1];
-        for (let i = 0; i < this.chart.NoteDataList.length; i++) {
-            const note = this.chart.NoteDataList[i];
+        for (let i = 0; i < this.notes.length; i++) {
+            const note = this.notes[i];
             this.lastNoteTimes.set(i, lastLaneNoteTimes[note.LaneId]);
             lastLaneNoteTimes[note.LaneId] = note.Time;
         }
@@ -411,8 +498,8 @@ export class HachimiGame {
     processKilledTargets() {
         const sorted = this.killedObjects
             .sort((a, b) => {
-                return this.chart.NoteDataList[a.index].Time -
-                    this.chart.NoteDataList[b.index].Time;
+                return this.notes[a.index].Time -
+                    this.notes[b.index].Time;
             });
 
         for (const obj of sorted) {
@@ -425,7 +512,7 @@ export class HachimiGame {
     }
 
     processKilledTarget({ index, where, note: noteObj }: { index: number, where: number, note: Note }) {
-        const note = this.chart.NoteDataList[index];
+        const note = this.notes[index];
         const lastNoteTime = this.lastNoteTimes.get(index);
 
         const offset = note.Time - this.time;
@@ -520,9 +607,9 @@ export class HachimiGame {
         noteObj.onhit = undefined;
         noteObj.clearFrames();
 
-        const noteIndex = this.notes.indexOf(noteObj);
+        const noteIndex = this.noteObjs.indexOf(noteObj);
         if (noteIndex != -1) {
-            this.notes.splice(noteIndex, 1);
+            this.noteObjs.splice(noteIndex, 1);
         }
 
         game.runAfterDelaySeconds(() => {
@@ -534,7 +621,7 @@ export class HachimiGame {
         if (judgement > 2) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -622,5 +709,25 @@ export class HachimiGame {
         Instance.EntFireAtName("hachimi_monitor", "SetBodyGroup", "cover," + this.music.monitorBodygroup);
         Instance.EntFireAtName("maodie_title_text", "SetMessage", this.music.name);
         Instance.EntFireAtName("maodie_charter_text", "SetMessage", this.music.charter);
+    }
+
+    switchPlayerWeapon(name: string) {
+        for (let i = 0; i < 8; i++) {
+            const pawn = Instance.GetPlayerPawn(i);
+            if (!pawn) {
+                break;
+            }
+
+            pawn.DestroyWeapons();
+            pawn.GiveNamedItem(name);
+
+            game.runNextTick(() => {
+                const weapon = pawn.FindWeapon(name);
+
+                if (weapon) {
+                    pawn.SwitchToWeapon(weapon);
+                }
+            });
+        }
     }
 }

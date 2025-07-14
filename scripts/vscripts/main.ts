@@ -84,6 +84,10 @@ Instance.PublicMethod("Music_Begin", () => {
         chart: {
             BarLineList: [],
             NoteDataList: [],
+            SoflanDataList: [{
+                Time: -60,
+                Speed: 1,
+            }],
         }
     };
 
@@ -119,8 +123,16 @@ Instance.PublicMethod("Music_SetOffset", (offsetStr: string) => {
 Instance.PublicMethod("Music_AddNote", (note: string) => {
     const [LaneId, Time] = JSON.parse(note) as number[];
 
+    currentMusic.chart.SoflanDataList.push({ Time, Speed: -1 });
+    currentMusic.chart.SoflanDataList.push({ Time: Time + 0.1, Speed: 1 });
+
     currentMusic.chart.NoteDataList.push({ LaneId, Time: Time + offset });
 });
+
+Instance.PublicMethod("Music_AddSoflan", (soflan: string) => {
+    const [Time, Speed] = JSON.parse(soflan) as number[];
+    currentMusic.chart.SoflanDataList.push({ Time, Speed });
+})
 
 Instance.PublicMethod("Music_SetSort", (sort: number) => {
     currentMusic.sort = sort;

@@ -3,9 +3,15 @@ export interface NoteData {
     LaneId: number;
 }
 
+export interface SoflanData {
+    Time: number;
+    Speed: number;
+}
+
 export interface Chart {
     NoteDataList: NoteData[];
     BarLineList: number[];
+    SoflanDataList: SoflanData[];
 }
 
 export interface Music {
