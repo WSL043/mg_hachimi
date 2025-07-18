@@ -39,7 +39,6 @@ function setAnimgraphParam(targetname: string, paramName: string, param: number 
 const callbacks: Map<string, () => void> = new Map();
 
 Instance.PublicMethod("OnNoteHit", (id: string) => {
-    Instance.Msg('OnNoteHit: ' + id);
     const cb = callbacks.get(id);
     if (cb) cb();
 });

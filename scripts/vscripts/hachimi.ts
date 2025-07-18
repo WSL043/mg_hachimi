@@ -51,7 +51,7 @@ export class HachimiGame {
 
         // Generate all frames until first soflan data
         // soflan data is ordered in descending
-        const frames: Frame[] = [];
+        let frames: Frame[] = [];
 
         for (let i = this.soflans.findIndex(s => s.Time < noteTime); i < this.soflans.length; i++) {
             frames.push({
@@ -72,6 +72,7 @@ export class HachimiGame {
         });
 
         frames.sort((a, b) => a.time - b.time);
+
         const strippedFrames: Frame[] = [];
 
         // find the first appear time (progress in [0, 1]) from generated frames
@@ -101,6 +102,19 @@ export class HachimiGame {
 
             strippedFrames.push(...frames.slice(i + 1));
             break;
+        }
+
+        // merge frames that space < 0.016 (1 frame)
+        for(let i = strippedFrames.length - 2; i >= 0; i--) {
+            const f1 = strippedFrames[i];
+            const f2 = strippedFrames[i + 1];
+
+            if (f2.time - f1.time > 0.016) {
+                continue;
+            }
+
+            // remove f1
+            strippedFrames.splice(i, 1);
         }
 
         // generate additional frames
@@ -206,7 +220,7 @@ export class HachimiGame {
         }
 
         this._noteFrames.sort((a, b) => a.frames[0].time - b.frames[0].time);
-
+        
         if (!this.option) {
             return;
         }
