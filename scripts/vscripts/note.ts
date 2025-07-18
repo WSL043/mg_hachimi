@@ -19,9 +19,30 @@ const LEFT_LANE = 896;
 const SPACE = 64;
 export const JUDGE_POINT = 0.93;
 
-function setAnimgraphParam(targetname: string, paramName: string, param: number | boolean | string) {
-    runServerCommand(`ent_animgraph_setvar ${paramName}=${param} ${targetname}`);
+let cmdExecuted = 0;
+let cmdQueue: string[] = [];
+const MAX_CMD_PER_FRAME = 100;
+
+function executeCommandQueued(cmd: string) {
+    if (cmdExecuted++ > MAX_CMD_PER_FRAME) {
+        cmdQueue.push(cmd);
+        return;
+    }
+
+    runServerCommand(cmd);
 }
+
+function setAnimgraphParam(targetname: string, paramName: string, param: number | boolean | string) {
+    executeCommandQueued(`ent_animgraph_setvar ${paramName}=${param} ${targetname}`);
+}
+
+const callbacks: Map<string, () => void> = new Map();
+
+Instance.PublicMethod("OnNoteHit", (id: string) => {
+    Instance.Msg('OnNoteHit: ' + id);
+    const cb = callbacks.get(id);
+    if (cb) cb();
+});
 
 export class Note {
     _targetname: string;
@@ -29,51 +50,30 @@ export class Note {
 
     teleporter: string = '';
 
-    constructor() {
-        const id = uniqueId();
-        this._targetname = "maodie_target_" + id
-        this._targetname_head = "maodie_target_head_" + id;
+    constructor(id: number) {
+        this._targetname = "mt_" + id
+        this._targetname_head = "mt_h_" + id;
 
-        createEntity({
-            class: 'prop_dynamic',
-            keyValues: {
-                targetName: this._targetname,
-                model: 'models/maodie_target.vmdl',
-                origin: { x: 0, y: 0, z: 0 },
-                solid: 'vphysics',
-                // @ts-expect-error
-                use_animgraph: true,
-                scales: '0 0 0',
-            },
-            outputs: {
-                onTakeDamage: () => {
-                    if (this._cb) this._cb(1);
-                }
-            },
-        });
-
-        createEntity({
-            class: 'prop_dynamic',
-            keyValues: {
-                targetName: this._targetname_head,
-                model: 'models/maodie_target_head.vmdl',
-                origin: { x: 0, y: 0, z: 0 },
-                solid: 'vphysics',
-                // @ts-expect-error
-                use_animgraph: true,
-                scales: '0 0 0',
-            },
-            outputs: {
-                onTakeDamage: () => {
-                    if (this._cb) this._cb(0);
-                }
-            },
-        });
+        executeCommandQueued(`ent_create prop_dynamic { "targetname" "${this._targetname}" "origin" "1000 9999 -100" "model" "models/maodie_target.vmdl" "solid" "6" }`);
+        executeCommandQueued(`ent_create prop_dynamic { "targetname" "${this._targetname_head}" "origin" "1000 9999 -100" "model" "models/maodie_target_head.vmdl" "solid" "6" }`);
 
         game.runAfterDelaySeconds(() => {
+            executeCommandQueued(`ent_fire ${this._targetname} addoutput OnTakeDamage>s2ts-script>OnNoteHit>${id}_1>>`);
+            executeCommandQueued(`ent_fire ${this._targetname_head} addoutput OnTakeDamage>s2ts-script>OnNoteHit>${id}_0>>`);
             Instance.EntFireAtName(this._targetname_head, "SetParent", this._targetname);
             Instance.EntFireAtName(this._targetname_head, "SetParentAttachment", "target", 0.01);
-        }, C.WAIT_TIME);
+
+            Instance.EntFireAtName(this._targetname_head, "AddOutput", `OnTakeDamage>s2ts-script>OnNoteHit>${id}_0>>`);
+            Instance.EntFireAtName(this._targetname, "AddOutput", `OnTakeDamage>s2ts-script>OnNoteHit>${id}_1>>`);
+        }, 0.1);
+
+        callbacks.set(`${id}_0`, () => {
+            if (this._cb) this._cb(0);
+        });
+
+        callbacks.set(`${id}_1`, () => {
+            if (this._cb) this._cb(1);
+        });
     }
 
     private _up = false;
@@ -82,6 +82,10 @@ export class Note {
     }
 
     set up(value: boolean) {
+        if (value == this._up) {
+            return;
+        }
+
         setAnimgraphParam(this._targetname, "IsUp", value);
         this._up = value;
     }
@@ -92,6 +96,10 @@ export class Note {
     }
 
     set positon(value: number) {
+        if (Math.abs(value - this._positon) < 0.001) {
+            return;
+        }
+
         setAnimgraphParam(this._targetname, "Position", value);
         this._positon = value;
     }
@@ -218,7 +226,7 @@ export class Note {
                 }
 
                 if (frame.callback) {
-                    frame.callback();
+                    frame.callback.bind(this)();
                 }
             }
         }
@@ -250,8 +258,16 @@ export class Note {
 }
 
 export class NotePool {
+    _lastNoteIndex = 0;
     _pool: Note[] = [];
     _teleports = new Map<number, string>();
+
+    /**
+     *
+     */
+    constructor() {
+
+    }
 
     rent(lane: number): Note {
         const targetName = "maodie_spawnpoint_" + lane;
@@ -269,7 +285,7 @@ export class NotePool {
             });
         }
 
-        const existing = this._pool.pop() ?? new Note();
+        const existing = this._pool.pop() ?? new Note(this._lastNoteIndex++);
         existing.teleporter = targetName;
 
         return existing;
@@ -279,5 +295,15 @@ export class NotePool {
         note.hide();
         note.reset();
         this._pool.push(note);
+    }
+
+    onTick() {
+        cmdExecuted = 0;
+        const queuedCmd = cmdQueue.slice();
+        cmdQueue = [];
+
+        for (const cmd of queuedCmd) {
+            executeCommandQueued(cmd);
+        }
     }
 }

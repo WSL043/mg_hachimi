@@ -88,6 +88,7 @@ Instance.PublicMethod("Music_Begin", () => {
                 Time: -60,
                 Speed: 1,
             }],
+            WeaponDataList: []
         }
     };
 
@@ -123,15 +124,17 @@ Instance.PublicMethod("Music_SetOffset", (offsetStr: string) => {
 Instance.PublicMethod("Music_AddNote", (note: string) => {
     const [LaneId, Time] = JSON.parse(note) as number[];
 
-    currentMusic.chart.SoflanDataList.push({ Time, Speed: -1 });
-    currentMusic.chart.SoflanDataList.push({ Time: Time + 0.1, Speed: 1 });
-
     currentMusic.chart.NoteDataList.push({ LaneId, Time: Time + offset });
 });
 
 Instance.PublicMethod("Music_AddSoflan", (soflan: string) => {
     const [Time, Speed] = JSON.parse(soflan) as number[];
     currentMusic.chart.SoflanDataList.push({ Time, Speed });
+});
+
+Instance.PublicMethod("Music_WeaponSwitch", (sw: string) => {
+    const [Time, Weapon] = JSON.parse(sw.replaceAll('\'', '"')) as any[];
+    currentMusic.chart.WeaponDataList.push({ Time, Weapon });
 })
 
 Instance.PublicMethod("Music_SetSort", (sort: number) => {
@@ -213,7 +216,7 @@ game.onTick(() => {
 
     inst.onTick();
 
-    if (!trackTimeMod) {
+    if (!trackTimeMod || !inst.musicStopped) {
         return;
     }
 
@@ -300,4 +303,15 @@ Instance.PublicMethod("ToggleWeaponSpread", () => {
 
     runServerCommand("weapon_accuracy_nospread " + (spread ? '0' : '1'));
     Instance.EntFireAtName("weapon_spread_display", "SetMessage", spread ? 'ON' : 'OFF');
+});
+
+
+Instance.PublicMethod("ToggleAutoPlay", () => {
+    const inst = HachimiGame.instance;
+    if (!inst || !inst.musicStopped) {
+        return;
+    }
+
+    inst.autoplay = !inst.autoplay;
+    Instance.EntFireAtName("autoplay_display", "SetMessage", inst.autoplay ? 'ON' : 'OFF');
 });

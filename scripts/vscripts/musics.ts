@@ -8,10 +8,16 @@ export interface SoflanData {
     Speed: number;
 }
 
+export interface WeaponData {
+    Time: number;
+    Weapon: string;
+}
+
 export interface Chart {
     NoteDataList: NoteData[];
     BarLineList: number[];
     SoflanDataList: SoflanData[];
+    WeaponDataList: WeaponData[];
 }
 
 export interface Music {

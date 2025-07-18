@@ -1,7 +1,7 @@
 /// <reference types="s2ts/types/cspointscript" />
 import { Instance } from "cspointscript"
 import { runServerCommand, game, addOutputByName, createEntity, uniqueId, Vector } from "s2ts/counter-strike"
-import { Chart, charts } from './musics';
+import { Chart, charts, NoteData } from './musics';
 import { C, JudgeOpt, Opt } from "./constants";
 import { SoundEffect, createSoundEvent } from "./sound";
 import { JudgeTipController } from "./judge_tip_controller";
@@ -29,179 +29,21 @@ export class HachimiGame {
         return charts[this.musicIndex];
     }
 
+    autoplay = false;
     option: Opt = Opt.Off;
     judgeOption: JudgeOpt = JudgeOpt.Normal;
 
     _lastMusicIndex = -1;
     _lastOption: Opt = Opt.Off;
     _moddedChart: Chart | undefined;
+    _noteFrames: { frames: Frame[], note: number }[] | undefined = []
 
     _pool = new NotePool();
 
-    applyChartOptions() {
-        this._moddedChart = JSON.parse(JSON.stringify(this.music.chart)) as Chart;
-        this._moddedChart.NoteDataList = this._moddedChart.NoteDataList.sort((a, b) => a.Time - b.Time);
-        this._moddedChart.SoflanDataList = this._moddedChart.SoflanDataList.sort((a, b) => b.Time - a.Time);
+    calculateNoteFrames(noteIndex: number, noteData: NoteData) {
+        const self = this;
+        const noteTime = noteData.Time;
 
-        if (!this.option) {
-            return;
-        }
-
-        this._lastMusicIndex = this.musicIndex;
-        this._lastOption = this.option;
-
-        const notes = this._moddedChart.NoteDataList;
-
-        if (this.option < Opt.S_Random) {
-            let laneMap: number[] = [0, 1, 2, 3, 4, 5, 6];
-
-            if (this.option == Opt.Mirror) {
-                laneMap.reverse();
-            } else if (this.option == Opt.Random) {
-                let i = 7;
-                while (i > 0) {
-                    const j = Math.floor(Math.random() * i);
-                    i--;
-
-                    [laneMap[i], laneMap[j]] = [laneMap[j], laneMap[i]];
-                }
-            } else if (this.option == Opt.R_Random) {
-                const shift = 1 + Math.floor(Math.random() * 6);
-
-                for (let i = 0; i < shift; i++) {
-                    laneMap.push(laneMap.shift()!)
-                }
-            }
-
-            for (const note of notes) {
-                note.LaneId = laneMap[note.LaneId];
-            }
-
-            runServerCommand("say \"" + C.OPTION_TO_TEXT[this.option] + ": " + [0, 1, 2, 3, 4, 5, 6]
-                .map(v => laneMap[v] + 1)
-                .join('') + "\""
-            );
-        } else if (this.option == Opt.S_Random) {
-            for (const note of notes) {
-                note.LaneId = Math.floor(Math.random() * 7);
-            }
-        }
-
-        runServerCommand("say Applyed " + C.OPTION_TO_TEXT[this.option]);
-    }
-
-    get chart() {
-        if (!this._moddedChart) {
-            throw new Error("using chart before apply options.");
-        }
-
-
-        return this._moddedChart;
-    }
-
-    get notes() {
-        return this.chart.NoteDataList;
-    }
-
-    get soflans() {
-        return this.chart.SoflanDataList;
-    }
-
-    get musicName() {
-        return this.music.name;
-    }
-
-    get musicSndEvent() {
-        return this.music.sndEvent;
-    }
-
-    static lastTemplateSuffix = 1;
-    lastTrySuffix = HachimiGame.lastTemplateSuffix;
-
-    postInited = false;
-
-    killedObjects: { index: number, where: number, note: Note }[] = [];
-    lastNoteTimes = new Map<number, number>();
-    noteObjs: Note[] = [];
-
-    lastTime = 0;
-
-    musicStartTime = 0;
-    lastNoteIndex = 0;
-    musicStarted = false;
-    musicStopped = true;
-    canStart = false;
-    hardStopped = false;
-
-    noteProgress = 0;
-
-    gameplayStatus = {
-        perfect: 0,
-        great: 0,
-        good: 0,
-        bad: 0,
-        poor: 0,
-        headshot: 0,
-        bodyshot: 0,
-        combo: 0,
-        maxcombo: 0,
-        offset: 0,
-        late: 0,
-        early: 0,
-    };
-
-    judgeTipControllers: JudgeTipController[] = [];
-
-    combobreakEffect: SoundEffect;
-    comboEffects: SoundEffect[];
-
-    haEffect: SoundEffect;
-
-    hitmarkerEffect: SoundEffect;
-    headshotHitmarkerEffect: SoundEffect;
-    hitmarkerController: HitmarkerController = new HitmarkerController("hitmarker_particle");
-    headshotHitmarkerController: HitmarkerController = new HitmarkerController("hitmarker_particle_headshot");
-
-    constructor() {
-    }
-
-    postInit() {
-        this.postInited = true;
-
-        game.runNextTick(() => {
-            Instance.EntFireAtName('maodie_start_text', 'SetMessage', "PRESS TO START");
-
-            for (let i = 0; i < 7; i++) {
-                this.judgeTipControllers.push(new JudgeTipController('maodie_judge_tip_' + i));
-            }
-
-            this.haEffect = createSoundEvent('effect.maodie_ha');
-            this.hitmarkerEffect = createSoundEvent('effect.hitmarker');
-            this.headshotHitmarkerEffect = createSoundEvent('effect.hitmarker_headshot');
-            this.combobreakEffect = createSoundEvent('effect.siren_laugh');
-            this.comboEffects = ['effect.wow', 'effect.manbo', 'effect.oye'].map(v => createSoundEvent(v));
-
-            runServerCommand("exec music_list.cfg");
-            this.updateText();
-            this.updateMusic();
-
-            this.canStart = true;
-            runServerCommand("say Ready");
-        });
-    }
-
-    get time() {
-        return Instance.GetGameTime() - this.musicStartTime;
-    }
-
-    spawnMaodie(spawnPoint: number, noteTime: number, noteIndex: number) {
-        if (spawnPoint < 0 || spawnPoint > 6) {
-            Instance.Msg("invalid spawn point " + spawnPoint);
-
-            return;
-        }
-
-        const note = this._pool.rent(spawnPoint);
         const playerSpeed = JUDGE_POINT / this.trackTime;
 
         let time = noteTime;
@@ -277,8 +119,8 @@ export class HachimiGame {
                 strippedFrames.push({
                     time: f1.time + ((0 - p1) / s) * t - C.WAIT_TIME,
                     isUp: true,
-                    callback: () => {
-                        note.show();
+                    callback: function () {
+                        this.show();
                     },
                 });
             }
@@ -287,47 +129,262 @@ export class HachimiGame {
                 strippedFrames.push({
                     time: f1.time + ((1 - p1) / s) * t - C.WAIT_TIME,
                     isUp: true,
-                    callback: () => {
-                        note.show();
+                    callback: function () {
+                        this.show();
+                    },
+                });
+            }
+
+            // hide
+            if (p2 <= 0 && p1 > 0) {
+                strippedFrames.push({
+                    time: f1.time + ((0 - p1) / s) * t - C.WAIT_TIME,
+                    isUp: false,
+                    callback: function () {
+                        this.hide();
+                    },
+                });
+            }
+
+            if (p2 >= 1 && p1 < 1) {
+                strippedFrames.push({
+                    time: f1.time + ((1 - p1) / s) * t - C.WAIT_TIME,
+                    isUp: false,
+                    callback: function () {
+                        this.hide();
                     },
                 });
             }
 
             if (f2.time == noteTime) {
                 // stop
-                strippedFrames.push({
-                    time: f2.time + C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
-                    progress: p2 + v * C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
-                    callback: () => {
-                        this.haEffect.play();
-                        this.processKilledTarget({
+                if (this.autoplay) {
+                    f2.callback = function () {
+                        self.processKilledTarget({
                             index: noteIndex,
-                            where: 2,
-                            note
+                            where: 0,
+                            note: this,
                         });
-                    }
-                });
-
+                    };
+                } else {
+                    strippedFrames.push({
+                        time: f2.time + C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
+                        progress: p2 + v * C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
+                        callback: function () {
+                            self.haEffect.play();
+                            self.processKilledTarget({
+                                index: noteIndex,
+                                where: 2,
+                                note: this,
+                            });
+                        }
+                    });
+                }
                 // change material
-                note.addFrame({
+                strippedFrames.push({
                     time: noteTime - C.JUDGE_RANGE_SETS[this.judgeOption].GOOD,
                     bodygroup: 2,
                 });
             }
         }
 
-        Instance.Msg(JSON.stringify(strippedFrames));
+        strippedFrames.sort((a, b) => a.time - b.time);
+        return strippedFrames;
+    }
 
-        strippedFrames.forEach(f => note.addFrame(f));
+    applyChartOptions() {
+        this._moddedChart = JSON.parse(JSON.stringify(this.music.chart)) as Chart;
+        this._moddedChart.NoteDataList = this._moddedChart.NoteDataList.sort((a, b) => a.Time - b.Time);
+        this._moddedChart.SoflanDataList = this._moddedChart.SoflanDataList.sort((a, b) => b.Time - a.Time);
+        this._moddedChart.WeaponDataList = this._moddedChart.WeaponDataList.sort((a, b) => b.Time - a.Time);
+
+        const notes = this._moddedChart.NoteDataList;
+        this._noteFrames = [];
+        for (let i = 0; i < notes.length; i++) {
+            const frames = this.calculateNoteFrames(i, notes[i]);
+            this._noteFrames.push({ frames, note: i });
+        }
+
+        this._noteFrames.sort((a, b) => a.frames[0].time - b.frames[0].time);
+
+        if (!this.option) {
+            return;
+        }
+
+        this._lastMusicIndex = this.musicIndex;
+        this._lastOption = this.option;
+
+        if (this.option < Opt.S_Random) {
+            let laneMap: number[] = [0, 1, 2, 3, 4, 5, 6];
+
+            if (this.option == Opt.Mirror) {
+                laneMap.reverse();
+            } else if (this.option == Opt.Random) {
+                let i = 7;
+                while (i > 0) {
+                    const j = Math.floor(Math.random() * i);
+                    i--;
+
+                    [laneMap[i], laneMap[j]] = [laneMap[j], laneMap[i]];
+                }
+            } else if (this.option == Opt.R_Random) {
+                const shift = 1 + Math.floor(Math.random() * 6);
+
+                for (let i = 0; i < shift; i++) {
+                    laneMap.push(laneMap.shift()!)
+                }
+            }
+
+            for (const note of notes) {
+                note.LaneId = laneMap[note.LaneId];
+            }
+
+            runServerCommand("say \"" + C.OPTION_TO_TEXT[this.option] + ": " + [0, 1, 2, 3, 4, 5, 6]
+                .map(v => laneMap[v] + 1)
+                .join('') + "\""
+            );
+        } else if (this.option == Opt.S_Random) {
+            for (const note of notes) {
+                note.LaneId = Math.floor(Math.random() * 7);
+            }
+        }
+
+        runServerCommand("say Applyed " + C.OPTION_TO_TEXT[this.option]);
+    }
+
+    get chart() {
+        if (!this._moddedChart) {
+            throw new Error("using chart before apply options.");
+        }
+
+
+        return this._moddedChart;
+    }
+
+    get notes() {
+        return this.chart.NoteDataList;
+    }
+
+    get soflans() {
+        return this.chart.SoflanDataList;
+    }
+
+    get weapons() {
+        return this.chart.WeaponDataList;
+    }
+
+    get musicName() {
+        return this.music.name;
+    }
+
+    get musicSndEvent() {
+        return this.music.sndEvent;
+    }
+
+    static lastTemplateSuffix = 1;
+    lastTrySuffix = HachimiGame.lastTemplateSuffix;
+
+    postInited = false;
+
+    killedObjects: { index: number, where: number, note: Note }[] = [];
+    lastNoteTimes = new Map<number, number>();
+    noteObjs: Note[] = [];
+
+    lastTime = 0;
+
+    musicStartTime = 0;
+    lastNoteIndex = 0;
+    lastWeaponIndex = 0;
+    musicStarted = false;
+    musicStopped = true;
+    canStart = false;
+    hardStopped = false;
+
+    noteProgress = 0;
+
+    gameplayStatus = {
+        perfect: 0,
+        great: 0,
+        good: 0,
+        bad: 0,
+        poor: 0,
+        headshot: 0,
+        bodyshot: 0,
+        combo: 0,
+        maxcombo: 0,
+        offset: 0,
+        late: 0,
+        early: 0,
+    };
+
+    judgeTipControllers: JudgeTipController[] = [];
+
+    combobreakEffect: SoundEffect;
+    comboEffects: SoundEffect[];
+
+    haEffect: SoundEffect;
+
+    hitmarkerEffect: SoundEffect;
+    headshotHitmarkerEffect: SoundEffect;
+    hitmarkerController: HitmarkerController = new HitmarkerController("hitmarker_particle");
+    headshotHitmarkerController: HitmarkerController = new HitmarkerController("hitmarker_particle_headshot");
+
+    constructor() {
+    }
+
+    postInit() {
+        this.postInited = true;
+
+        game.runNextTick(() => {
+            Instance.EntFireAtName('maodie_start_text', 'SetMessage', "PRESS TO START");
+
+            for (let i = 0; i < 7; i++) {
+                this.judgeTipControllers.push(new JudgeTipController('maodie_judge_tip_' + i));
+            }
+
+            this.haEffect = createSoundEvent('effect.maodie_ha');
+            this.hitmarkerEffect = createSoundEvent('effect.hitmarker');
+            this.headshotHitmarkerEffect = createSoundEvent('effect.hitmarker_headshot');
+            this.combobreakEffect = createSoundEvent('effect.siren_laugh');
+            this.comboEffects = ['effect.wow', 'effect.manbo', 'effect.oye'].map(v => createSoundEvent(v));
+
+            runServerCommand("exec music_list.cfg");
+            this.updateText();
+            this.updateMusic();
+
+            this.canStart = true;
+            runServerCommand("say Ready");
+        });
+    }
+
+    get time() {
+        return Instance.GetGameTime() - this.musicStartTime;
+    }
+
+    spawnMaodie(spawnPoint: number, noteIndex: number, frames: Frame[]) {
+        if (spawnPoint < 0 || spawnPoint > 6) {
+            Instance.Msg("invalid spawn point " + spawnPoint);
+
+            return;
+        }
+
+        const note = this._pool.rent(spawnPoint);
+
+        frames.forEach(f => note.addFrame(f));
         note.setupFrames();
-        note.onhit = (where: number) => {
-            this.onTargetKilled(noteIndex, where, note);
-        };
+
+        if (!this.autoplay) {
+            note.onhit = (where: number) => {
+                this.onTargetKilled(noteIndex, where, note);
+            };
+        }
 
         this.noteObjs.push(note);
     }
 
     onTick() {
+        this._pool.onTick();
+
         this.processKilledTargets();
 
         this.noteObjs.forEach(v => v.onTick(this.time));
@@ -335,12 +392,11 @@ export class HachimiGame {
         this.hitmarkerController.onTick();
         this.headshotHitmarkerController.onTick();
 
-        if (!this.postInited || this.musicStopped) {
+        if (!this.postInited || this.musicStopped || !this._noteFrames) {
             return;
         }
 
         const musicTime = this.time;
-        const notes = this.notes;
 
         if (musicTime > 0 && !this.musicStarted) {
             this.musicStarted = true;
@@ -349,18 +405,31 @@ export class HachimiGame {
             runServerCommand("say play");
         }
 
-        for (let i = this.lastNoteIndex; i < notes.length; i++) {
-            const note = notes[i];
+        for (let i = this.lastNoteIndex; i < this.notes.length; i++) {
+            const note = this._noteFrames[i];
+            const firstTime = note.frames[0].time;
+            const noteData = this.notes[note.note];
 
-            if (musicTime < note.Time - (this.trackTime + C.WAIT_TIME + 0.1)) {
+            if (musicTime < firstTime - 0.1) {
                 break;
             }
 
-            this.spawnMaodie(note.LaneId, note.Time, i);
+            this.spawnMaodie(noteData.LaneId, i, note.frames);
             this.lastNoteIndex++;
-        } 1
+        }
 
-        if (this.lastNoteIndex >= notes.length) {
+        for (let i = this.lastWeaponIndex; i < this.weapons.length; i++) {
+            const weapon = this.weapons[i];
+
+            if (musicTime < weapon.Time) {
+                break;
+            }
+
+            this.switchPlayerWeapon(weapon.Weapon);
+            this.lastWeaponIndex++;
+        }
+
+        if (this.lastNoteIndex >= this.notes.length) {
             this.stop(true);
         }
     }
@@ -470,6 +539,7 @@ export class HachimiGame {
             this.musicStarted = false;
             this.hardStopped = false;
             this.lastNoteIndex = 0;
+            this.lastWeaponIndex = 0;
 
             this.updateText();
 
@@ -650,7 +720,7 @@ export class HachimiGame {
             this.gameplayStatus.good * 1 +
             this.gameplayStatus.headshot;
         const percent = score / totalScore;
-        const rate = C.RATE_PRECENTS.find(v => v.percent <= percent)!.rate;
+        const rate = this.autoplay ? 'AUTOPLAY' : C.RATE_PRECENTS.find(v => v.percent <= percent)!.rate;
 
         Instance.EntFireAtName("game_score", "SetMessage", score.toString());
         Instance.EntFireAtName("game_score_percent", "SetMessage", (percent * 100).toFixed(2) + '%');
