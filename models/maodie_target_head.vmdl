@@ -1,4 +1,4 @@
-<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc39:version{1ceecb0d-4093-4729-ab18-b76886c64cde} -->
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc40:version{da0ab1f8-9722-4910-94b8-10b6a08c0934} -->
 {
 	rootNode = 
 	{
@@ -132,6 +132,7 @@
 					{
 						_class = "AnimFile"
 						name = "idle"
+						is_default_idle_anim = false
 						activity_name = ""
 						activity_weight = 1
 						weight_list_name = ""
@@ -144,12 +145,14 @@
 						anim_markup_ordered = false
 						disable_compression = false
 						animgraph_additive = false
+						delete_from_compiled_model = false
 						source_filename = "models/maodie_target_path.smd"
 						import_bone_scales = false
 						start_frame = -1
 						end_frame = 0
 						framerate = -1.0
 						reverse = false
+						additional_anim_files = [  ]
 					},
 				]
 				default_root_bone_name = ""
@@ -165,9 +168,9 @@
 						surface_prop = "Wood"
 						collision_prop = "default"
 						tool_material = ""
-						origin = [ 73.851486, 3.407587, 4.51002 ]
+						origin = [ 73.851486, 3.407587, 4.27984 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						dimensions = [ 19.533337, 19.783026, 1.4075 ]
+						dimensions = [ 19.533337, 19.783026, 1.867863 ]
 					},
 				]
 				leave_body_collision_unmodified = false
@@ -183,6 +186,7 @@
 						[
 							{
 								_class = "BodyGroupChoice"
+								name = "o"
 								meshes = 
 								[
 									"o",
@@ -190,6 +194,7 @@
 							},
 							{
 								_class = "BodyGroupChoice"
+								name = "nml"
 								meshes = 
 								[
 									"nml",
@@ -197,6 +202,7 @@
 							},
 							{
 								_class = "BodyGroupChoice"
+								name = "ha"
 								meshes = 
 								[
 									"ha",
@@ -205,6 +211,7 @@
 						]
 						hidden_in_tools = false
 						non_bodygroup_single_choice = false
+						suppress_missing_warnings = false
 					},
 				]
 			},

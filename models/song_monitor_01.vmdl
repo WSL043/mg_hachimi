@@ -1,4 +1,4 @@
-<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc39:version{1ceecb0d-4093-4729-ab18-b76886c64cde} -->
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc40:version{da0ab1f8-9722-4910-94b8-10b6a08c0934} -->
 {
 	rootNode = 
 	{
@@ -11,7 +11,7 @@
 				[
 					{
 						_class = "RenderMeshFile"
-						name = "manbo_manbo_sometimes_hachimi"
+						name = "monitor"
 						children = 
 						[
 							{
@@ -28,863 +28,6 @@
 							exclude_by_default = false
 							exception_list = [  ]
 						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "oiiaioiiiai"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/oiiaioiiiai.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models\\fbx\\mesh\\song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "haxuedamaoxian"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/haxuedamaoxian.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models\\fbx\\mesh\\song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "hachimi_winter"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/hachimi_winter.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models\\fbx\\mesh\\song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "eraby_e_connec_10n_otto"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/eraby_e_connec_10n_otto.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models\\fbx\\mesh\\song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "jumping_hachimi"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/jumping_hachimi.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models\\fbx\\mesh\\song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "hachimi_proi_proi"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/hachimi_proi_proi.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models\\fbx\\mesh\\song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "more_jump_more"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/more_jump_more.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models\\fbx\\mesh\\song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "dashchimi"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/dashchimi.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models\\fbx\\mesh\\song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "miracle_5ympho_x"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/miracle_5ympho_x.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models\\fbx\\mesh\\song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "hachi_midnight_city"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/hachi-midnight-city.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "incat"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/incat.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "halian"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/halian.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "hachimi_overdose"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/hachimi_overdose.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "135s_of_manbo"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/135s_of_manbo.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "space_manbo"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/space_manbo.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "manbo_no_more"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/manbo_no_more.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "huoquanjia"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/huoquanjia.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "chouxiang"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/chouxiang.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "hachi_xiang"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/hachi_xiang.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "the_feeling"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/the_feeling.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "otto_haruhikage"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/otto_haruhikage.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "manbo_your_body"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/manbo_your_body.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-					{
-						_class = "RenderMeshFile"
-						name = "hachimi_new_rules"
-						children = 
-						[
-							{
-								_class = "ReplaceMeshMaterials"
-								remaps = 
-								[
-									{
-										from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-										to = "materials/covers/hachimi_new_rules.vmat"
-									},
-									{
-										from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-										to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-									},
-								]
-								use_single_material = false
-								single_override_material = ""
-							},
-						]
-						filename = "models/fbx/mesh/song_monitor_01.fbx"
-						import_scale = 1.0
-						import_filter = 
-						{
-							exclude_by_default = false
-							exception_list = [  ]
-						}
-					},
-				]
-			},
-			{
-				_class = "BodyGroupList"
-				children = 
-				[
-					{
-						_class = "BodyGroup"
-						name = "cover"
-						children = 
-						[
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"manbo_manbo_sometimes_hachimi",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"oiiaioiiiai",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"haxuedamaoxian",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"hachimi_winter",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"eraby_e_connec_10n_otto",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"hachimi_proi_proi",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"jumping_hachimi",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"more_jump_more",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"dashchimi",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"miracle_5ympho_x",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"hachi_midnight_city",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"incat",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"halian",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"hachimi_overdose",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"135s_of_manbo",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"space_manbo",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"manbo_no_more",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"huoquanjia",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"chouxiang",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"hachi_xiang",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"the_feeling",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"otto_haruhikage",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"manbo_your_body",
-								]
-							},
-							{
-								_class = "BodyGroupChoice"
-								meshes = 
-								[
-									"hachimi_new_rules",
-								]
-							},
-						]
-						hidden_in_tools = false
-						non_bodygroup_single_choice = false
 					},
 				]
 			},
@@ -904,6 +47,287 @@
 					},
 				]
 				leave_body_collision_unmodified = false
+			},
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					{
+						_class = "MaterialGroup"
+						name = "0"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "1"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/oiiaioiiiai.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "2"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/haxuedamaoxian.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "3"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/hachimi_winter.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "4"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/eraby_e_connec_10n_otto.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "5"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/jumping_hachimi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "6"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/hachimi_proi_proi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "7"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/more_jump_more.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "8"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/dashchimi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "9"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/miracle_5ympho_x.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "10"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/hachi-midnight-city.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "11"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/incat.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "12"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/halian.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "13"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/hachimi_overdose.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "14"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/135s_of_manbo.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "15"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/space_manbo.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "16"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/manbo_no_more.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "17"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/huoquanjia.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "18"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/chouxiang.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "19"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/hachi_xiang.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "20"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/the_feeling.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "21"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/otto_haruhikage.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "22"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/manbo_your_body.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "23"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/hachimi_new_rules.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "24"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/under_hachimi_lights.vmat"
+							},
+						]
+					},
+				]
 			},
 		]
 		model_archetype = ""

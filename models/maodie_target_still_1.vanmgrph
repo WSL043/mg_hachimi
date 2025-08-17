@@ -1,0 +1,132 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:animgraph19:version{0adb35b7-2585-4302-8d05-e2825b4518ac} -->
+{
+	_class = "CAnimationGraph"
+	m_nodeManager = 
+	{
+		_class = "CAnimNodeManager"
+		m_nodes = 
+		[
+			{
+				key = 
+				{
+					m_id = 874184540
+				}
+				value = 
+				{
+					_class = "CRootAnimNode"
+					m_sName = "Unnamed"
+					m_vecPosition = [ 1162.0, 258.0 ]
+					m_nNodeID = 
+					{
+						m_id = 874184540
+					}
+					m_networkMode = "ServerAuthoritative"
+					m_inputConnection = 
+					{
+						m_nodeID = 
+						{
+							m_id = 2076688066
+						}
+						m_outputID = 
+						{
+							m_id = 2076688066
+						}
+					}
+				}
+			},
+			{
+				key = 
+				{
+					m_id = 2076688066
+				}
+				value = 
+				{
+					_class = "CSingleFrameAnimNode"
+					m_sName = "Unnamed"
+					m_vecPosition = [ 758.0, 226.0 ]
+					m_nNodeID = 
+					{
+						m_id = 2076688066
+					}
+					m_networkMode = "ServerAuthoritative"
+					m_sequenceName = "idle"
+					m_eFrameSelection = "SpecificFrame"
+					m_nFrameIndex = 0
+					m_actions = [  ]
+				}
+			},
+		]
+	}
+	m_componentManager = 
+	{
+		_class = "CAnimComponentManager"
+		m_components = [  ]
+	}
+	m_localParameters = 
+	[
+		{
+			_class = "CFloatAnimParameter"
+			m_name = "Position"
+			m_group = ""
+			m_id = 
+			{
+				m_id = 349574398
+			}
+			m_componentName = ""
+			m_previewButton = "ANIMPARAM_BUTTON_NONE"
+			m_bUseMostRecentValue = false
+			m_bAutoReset = false
+			m_eNetworkSetting = "Auto"
+			m_bGameWritable = true
+			m_bGraphWritable = true
+			m_bIsReferenced = false
+			m_bNetworkingRequested = false
+			m_fDefaultValue = 0.0
+			m_fMinValue = 0.0
+			m_fMaxValue = 1.0
+			m_bInterpolate = false
+		},
+		{
+			_class = "CBoolAnimParameter"
+			m_name = "IsUp"
+			m_group = ""
+			m_id = 
+			{
+				m_id = 688155509
+			}
+			m_componentName = ""
+			m_previewButton = "ANIMPARAM_BUTTON_NONE"
+			m_bUseMostRecentValue = false
+			m_bAutoReset = false
+			m_eNetworkSetting = "Auto"
+			m_bGameWritable = true
+			m_bGraphWritable = true
+			m_bIsReferenced = false
+			m_bNetworkingRequested = false
+			m_bDefaultValue = false
+		},
+	]
+	m_localTags = [  ]
+	m_referencedParamGroups = [  ]
+	m_referencedTagGroups = [  ]
+	m_pSettingsManager = 
+	{
+		_class = "CAnimGraphSettingsManager"
+		m_settingsGroups = 
+		[
+			{
+				_class = "CAnimGraphNetworkSettings"
+				m_bNetworkingEnabled = true
+			},
+		]
+	}
+	m_clipDataManager = 
+	{
+		_class = "CAnimClipDataManager"
+		m_itemTable = 
+		{
+		}
+	}
+	m_modelName = "models/maodie_target_bullet_blocker.vmdl"
+	m_previewModelName = ""
+}

@@ -1,4 +1,4 @@
-<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc39:version{1ceecb0d-4093-4729-ab18-b76886c64cde} -->
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc40:version{da0ab1f8-9722-4910-94b8-10b6a08c0934} -->
 {
 	rootNode = 
 	{
@@ -16,7 +16,11 @@
 						import_filter = 
 						{
 							exclude_by_default = false
-							exception_list = [  ]
+							exception_list = 
+							[
+								"prop_dynamic_models_target_maodie_normal_vmdl",
+								"mesh_141",
+							]
 						}
 					},
 				]
@@ -43,6 +47,7 @@
 								motion_type = "Single"
 							},
 						]
+						is_default_idle_anim = false
 						activity_name = ""
 						activity_weight = 1
 						weight_list_name = ""
@@ -55,12 +60,14 @@
 						anim_markup_ordered = false
 						disable_compression = false
 						animgraph_additive = false
+						delete_from_compiled_model = false
 						source_filename = "models/maodie_target_flipup.smd"
 						import_bone_scales = false
 						start_frame = -1
 						end_frame = -1
 						framerate = -1.0
 						reverse = false
+						additional_anim_files = [  ]
 					},
 					{
 						_class = "AnimFile"
@@ -80,6 +87,7 @@
 								motion_type = "Single"
 							},
 						]
+						is_default_idle_anim = false
 						activity_name = ""
 						activity_weight = 1
 						weight_list_name = ""
@@ -92,12 +100,14 @@
 						anim_markup_ordered = false
 						disable_compression = false
 						animgraph_additive = false
+						delete_from_compiled_model = false
 						source_filename = "models/maodie_target_path.smd"
 						import_bone_scales = false
 						start_frame = -1
 						end_frame = -1
 						framerate = -1.0
 						reverse = false
+						additional_anim_files = [  ]
 					},
 				]
 				default_root_bone_name = ""
@@ -113,9 +123,9 @@
 						surface_prop = "Wood"
 						collision_prop = "default"
 						tool_material = ""
-						origin = [ 32.078045, 0.200419, 4.51002 ]
+						origin = [ 32.078045, 0.200419, 3.930592 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						dimensions = [ 63.977692, 88.295769, 1.4075 ]
+						dimensions = [ 63.977692, 88.295769, 2.566353 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -124,9 +134,9 @@
 						surface_prop = "Wood"
 						collision_prop = "default"
 						tool_material = ""
-						origin = [ 76.294289, -25.173943, 4.51002 ]
+						origin = [ 76.294289, -25.173943, 3.833887 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						dimensions = [ 24.617039, 37.410374, 1.4075 ]
+						dimensions = [ 24.617039, 37.410374, 2.759785 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -135,9 +145,9 @@
 						surface_prop = "Wood"
 						collision_prop = "default"
 						tool_material = ""
-						origin = [ 76.212349, 28.895416, 4.51002 ]
+						origin = [ 76.212349, 28.895416, 3.879694 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						dimensions = [ 24.453159, 31.280811, 1.4075 ]
+						dimensions = [ 24.453159, 31.280811, 2.668156 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -146,9 +156,9 @@
 						surface_prop = "Wood"
 						collision_prop = "default"
 						tool_material = ""
-						origin = [ 86.011627, 3.398202, 4.51002 ]
+						origin = [ 86.011627, 3.398202, 3.786858 ]
 						angles = [ 0.0, 0.0, 0.0 ]
-						dimensions = [ 4.815789, 19.866627, 1.4075 ]
+						dimensions = [ 4.815789, 19.866627, 2.853836 ]
 					},
 				]
 				leave_body_collision_unmodified = false
@@ -162,6 +172,15 @@
 						name = "target"
 						parent_bone = "tag_target"
 						relative_origin = [ 0.0, 0.0, 0.1 ]
+						relative_angles = [ 180.0, 90.0, 180.0 ]
+						weight = 1.0
+						ignore_rotation = false
+					},
+					{
+						_class = "Attachment"
+						name = "blocker"
+						parent_bone = "tag_target"
+						relative_origin = [ 0.0, 0.0, 0.0 ]
 						relative_angles = [ 180.0, 90.0, 180.0 ]
 						weight = 1.0
 						ignore_rotation = false

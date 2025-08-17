@@ -56,7 +56,11 @@ Instance.PublicMethod("HachimiMusicNext", () => {
     inst.clearStatus();
 });
 
-let trackTimeMod = 0;
+function updateSpeedUI(inst: HachimiGame) {
+    const greenNumber = Math.floor((inst.trackTime * 1000 * 3) / 5);
+    Instance.EntFireAtName("maodie_green_num_text", "SetMessage", `${greenNumber}F`);
+    Instance.EntFireAtName("maodie_speed_text", "SetMessage", `${(inst.speed / 10).toFixed(2)} inch/s`);
+};
 
 Instance.PublicMethod("HachimiGreenNumAdd", (numStr: string) => {
     const inst = HachimiGame.instance;
@@ -64,11 +68,37 @@ Instance.PublicMethod("HachimiGreenNumAdd", (numStr: string) => {
         return;
     }
 
-    trackTimeMod = parseFloat(numStr);
+    inst.trackTime += parseFloat(numStr);
+
+    if (inst.trackTime < 0.01) {
+        inst.trackTime = 0.01;
+    } else if (inst.trackTime > 5) {
+        inst.trackTime = 5;
+    }
+
+    updateSpeedUI(inst);
 });
 
-Instance.PublicMethod("HachimiGreenNumAddStop", () => {
-    trackTimeMod = 0;
+function updateJudgeOffset(inst: HachimiGame) {
+    const ms = Math.floor(inst.judgeOffset * 1000);
+    Instance.EntFireAtName("maodie_judge_offset_text", "SetMessage", `${ms}ms`);
+};
+
+Instance.PublicMethod("HachimiJudgeOffsetAdd", (numStr: string) => {
+    const inst = HachimiGame.instance;
+    if (!inst || !inst.postInited) {
+        return;
+    }
+
+    inst.judgeOffset += parseFloat(numStr);
+
+    if (inst.judgeOffset < -1) {
+        inst.judgeOffset = -1;
+    } else if (inst.judgeOffset > 1) {
+        inst.judgeOffset = 1;
+    }
+
+    updateJudgeOffset(inst);
 });
 
 let currentMusic: Music = null!;
@@ -202,12 +232,6 @@ Instance.PublicMethod("ToggleJudgeOption", () => {
     Instance.EntFireAtName("judge_opt_display", "SetMessage", C.JUDGE_OPTION_TO_TEXT[inst.judgeOption] ?? 'NORMAL');
 });
 
-function updateSpeedUI(inst: HachimiGame) {
-    const greenNumber = Math.floor((inst.trackTime * 1000 * 3) / 5);
-    Instance.EntFireAtName("maodie_green_num_text", "SetMessage", greenNumber.toString());
-    Instance.EntFireAtName("maodie_speed_text", "SetMessage", (inst.speed / 10).toFixed(2));
-};
-
 game.onTick(() => {
     const inst = HachimiGame.instance;
     if (!inst || !inst.postInited) {
@@ -215,20 +239,6 @@ game.onTick(() => {
     }
 
     inst.onTick();
-
-    if (!trackTimeMod || !inst.musicStopped) {
-        return;
-    }
-
-    inst.trackTime += trackTimeMod;
-
-    if (inst.trackTime < 0.01) {
-        inst.trackTime = 0.01;
-    } else if (inst.trackTime > 5) {
-        inst.trackTime = 5;
-    }
-
-    updateSpeedUI(inst);
 });
 
 let lastCfgSuffix = 0;
@@ -314,4 +324,14 @@ Instance.PublicMethod("ToggleAutoPlay", () => {
 
     inst.autoplay = !inst.autoplay;
     Instance.EntFireAtName("autoplay_display", "SetMessage", inst.autoplay ? 'ON' : 'OFF');
+});
+
+Instance.PublicMethod("ToggleHitmarker", () => {
+    const inst = HachimiGame.instance;
+    if (!inst) {
+        return;
+    }
+
+    inst.hitmarker = !inst.hitmarker;
+    Instance.EntFireAtName("hitmarker_display", "SetMessage", inst.hitmarker ? 'ON' : 'OFF');
 });

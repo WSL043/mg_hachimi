@@ -1,0 +1,15 @@
+// Exported with Source Maya Tools
+// Scene: 'F:\SteamLibrary\steamapps\common\Counter-Strike Global Offensive\content\csgo_addons\mg_hachimi\models\progress_bar.mb'
+version 1
+nodes
+0 "start" -1
+1 "end" 0
+end
+skeleton
+time 0
+0  0.000000 319.1199993 0.000000  0.000000 -0.000000 0.000000
+1  0.000000 -609.24000072 0.000000  0.000000 -0.000000 0.000000
+time 1
+0  0.000000 319.1199993 0.000000  0.000000 -0.000000 0.000000
+1  0.000000 0.000000 0.000000  0.000000 -0.000000 0.000000
+end

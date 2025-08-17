@@ -19,6 +19,7 @@ export class HachimiGame {
     }
 
     trackTime = 1.25;
+    judgeOffset = 0;
     musicIndex = 0;
 
     get speed() {
@@ -32,6 +33,7 @@ export class HachimiGame {
     autoplay = false;
     option: Opt = Opt.Off;
     judgeOption: JudgeOpt = JudgeOpt.Normal;
+    hitmarker = true;
 
     _lastMusicIndex = -1;
     _lastOption: Opt = Opt.Off;
@@ -105,7 +107,7 @@ export class HachimiGame {
         }
 
         // merge frames that space < 0.016 (1 frame)
-        for(let i = strippedFrames.length - 2; i >= 0; i--) {
+        for (let i = strippedFrames.length - 2; i >= 0; i--) {
             const f1 = strippedFrames[i];
             const f2 = strippedFrames[i + 1];
 
@@ -220,7 +222,7 @@ export class HachimiGame {
         }
 
         this._noteFrames.sort((a, b) => a.frames[0].time - b.frames[0].time);
-        
+
         if (!this.option) {
             return;
         }
@@ -521,7 +523,7 @@ export class HachimiGame {
 
         while (blankTime < 0 ||
             blankTime < barTime * 2 ||
-            blankTime < this.trackTime + C.WAIT_TIME
+            blankTime < -Math.min(0, this._noteFrames![0].frames[0].time)
         ) {
             blankTime += barTime;
         }
@@ -599,19 +601,19 @@ export class HachimiGame {
         const note = this.notes[index];
         const lastNoteTime = this.lastNoteTimes.get(index);
 
-        const offset = note.Time - this.time;
+        const offset = note.Time - this.time - this.judgeOffset;
 
         if (offset > C.JUDGE_RANGE_SETS[this.judgeOption].POOR) {
-            return false;
+            return true;
         }
 
         const judgeDelta = Math.abs(offset);
 
         if (judgeDelta > C.JUDGE_RANGE_SETS[JudgeOpt.Normal].PGREAT && lastNoteTime && lastNoteTime != -1) {
-            const minJudgeTime = lastNoteTime + (note.Time - lastNoteTime) / 2;
+            const minJudgeTime = lastNoteTime + (note.Time - lastNoteTime) / 2 - this.judgeOffset;
 
-            if (this.time < minJudgeTime) {
-                return false;
+            if (this.time - this.judgeOffset < minJudgeTime) {
+                return true;
             }
         }
 
@@ -653,12 +655,14 @@ export class HachimiGame {
         }
 
         if (judgement <= 2) {
-            if (where == 0) {
-                this.headshotHitmarkerController.show();
-                this.headshotHitmarkerEffect.play();
-            } else {
-                this.hitmarkerController.show();
-                this.hitmarkerEffect.play();
+            if (this.hitmarker) {
+                if (where == 0) {
+                    this.headshotHitmarkerController.show();
+                    this.headshotHitmarkerEffect.play();
+                } else {
+                    this.hitmarkerController.show();
+                    this.hitmarkerEffect.play();
+                }
             }
 
             this.gameplayStatus.combo++;
@@ -770,27 +774,12 @@ export class HachimiGame {
         Instance.EntFireAtName("game_indicator", "SetMessage", status.join('\n'));
 
         const progress = (this.noteProgress + 1) / this.music.chart.NoteDataList.length;
-        const progressText = new Array(Math.floor(progress * 45))
-            .fill('▉')
-            .join('');
-
-        const progressLast = (p => {
-            if (p >= 0.875) return '▉';
-            if (p >= 0.75) return '▊';
-            if (p >= 0.625) return '▋';
-            // if (p >= 0.5) return '▌';
-            if (p >= 0.375) return '▍';
-            if (p >= 0.25) return '▎';
-            if (p >= 0.125) return '▏';
-            return '';
-        })(progress * 45 - progressText.length);
-
-        Instance.EntFireAtName("game_progress", "SetMessage", progressText + progressLast);
+        Instance.EntFireAtName("animgraph_ctrl", "SetProgressBar", progress);
     }
 
     updateMusic() {
         runServerCommand("say " + this.music.name);
-        Instance.EntFireAtName("hachimi_monitor", "SetBodyGroup", "cover," + this.music.monitorBodygroup);
+        Instance.EntFireAtName("hachimi_monitor", "SetMaterialGroup", this.music.monitorBodygroup);
         Instance.EntFireAtName("maodie_title_text", "SetMessage", this.music.name);
         Instance.EntFireAtName("maodie_charter_text", "SetMessage", this.music.charter);
     }

@@ -32,8 +32,14 @@ function executeCommandQueued(cmd: string) {
     runServerCommand(cmd);
 }
 
+let lastTargetName: string = '';
 function setAnimgraphParam(targetname: string, paramName: string, param: number | boolean | string) {
-    executeCommandQueued(`ent_animgraph_setvar ${paramName}=${param} ${targetname}`);
+    if (targetname != lastTargetName) {
+        Instance.EntFireAtName("animgraph_ctrl", "SetTarget", targetname);
+        lastTargetName = targetname;
+    }
+
+    Instance.EntFireAtName("animgraph_ctrl", `Set${paramName}`, param);
 }
 
 const callbacks: Map<string, () => void> = new Map();
@@ -46,21 +52,25 @@ Instance.PublicMethod("OnNoteHit", (id: string) => {
 export class Note {
     _targetname: string;
     _targetname_head: string;
+    _targetname_blocker: string;
 
     teleporter: string = '';
 
     constructor(id: number) {
         this._targetname = "mt_" + id
         this._targetname_head = "mt_h_" + id;
+        this._targetname_blocker = "mt_bl_" + id;
 
         executeCommandQueued(`ent_create prop_dynamic { "targetname" "${this._targetname}" "origin" "1000 9999 -100" "model" "models/maodie_target.vmdl" "solid" "6" }`);
         executeCommandQueued(`ent_create prop_dynamic { "targetname" "${this._targetname_head}" "origin" "1000 9999 -100" "model" "models/maodie_target_head.vmdl" "solid" "6" }`);
+        executeCommandQueued(`ent_create prop_dynamic { "targetname" "${this._targetname_blocker}" "origin" "1000 9999 -100" "model" "models/maodie_target_bullet_blocker.vmdl" "solid" "6" }`);
 
         game.runAfterDelaySeconds(() => {
-            executeCommandQueued(`ent_fire ${this._targetname} addoutput OnTakeDamage>s2ts-script>OnNoteHit>${id}_1>>`);
-            executeCommandQueued(`ent_fire ${this._targetname_head} addoutput OnTakeDamage>s2ts-script>OnNoteHit>${id}_0>>`);
             Instance.EntFireAtName(this._targetname_head, "SetParent", this._targetname);
             Instance.EntFireAtName(this._targetname_head, "SetParentAttachment", "target", 0.01);
+            
+            Instance.EntFireAtName(this._targetname_blocker, "SetParent", this._targetname);
+            Instance.EntFireAtName(this._targetname_blocker, "SetParentAttachment", "target", 0.01);
 
             Instance.EntFireAtName(this._targetname_head, "AddOutput", `OnTakeDamage>s2ts-script>OnNoteHit>${id}_0>>`);
             Instance.EntFireAtName(this._targetname, "AddOutput", `OnTakeDamage>s2ts-script>OnNoteHit>${id}_1>>`);
@@ -128,11 +138,13 @@ export class Note {
     hide() {
         Instance.EntFireAtName(this._targetname, "SetScale", "0");
         Instance.EntFireAtName(this._targetname_head, "SetScale", "0");
+        Instance.EntFireAtName(this._targetname_blocker, "SetScale", "0");
     }
 
     show() {
         Instance.EntFireAtName(this._targetname, "SetScale", "1");
         Instance.EntFireAtName(this._targetname_head, "SetScale", "1");
+        Instance.EntFireAtName(this._targetname_blocker, "SetScale", "1");
 
         Instance.EntFireAtName(this.teleporter, "TeleportEntity", this._targetname);
     }
