@@ -1,0 +1,147 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:animgraph19:version{0adb35b7-2585-4302-8d05-e2825b4518ac} -->
+{
+	_class = "CAnimationGraph"
+	m_nodeManager = 
+	{
+		_class = "CAnimNodeManager"
+		m_nodes = 
+		[
+			{
+				key = 
+				{
+					m_id = 1488894277
+				}
+				value = 
+				{
+					_class = "CCycleControlAnimNode"
+					m_sName = "Unnamed"
+					m_vecPosition = [ 782.0, 592.0 ]
+					m_nNodeID = 
+					{
+						m_id = 1488894277
+					}
+					m_networkMode = "ServerAuthoritative"
+					m_inputConnection = 
+					{
+						m_nodeID = 
+						{
+							m_id = 1922840513
+						}
+						m_outputID = 
+						{
+							m_id = 1922840513
+						}
+					}
+					m_valueSource = "Parameter"
+					m_param = 
+					{
+						m_id = 1905320777
+					}
+				}
+			},
+			{
+				key = 
+				{
+					m_id = 1551029188
+				}
+				value = 
+				{
+					_class = "CRootAnimNode"
+					m_sName = "Unnamed"
+					m_vecPosition = [ 958.0, 509.0 ]
+					m_nNodeID = 
+					{
+						m_id = 1551029188
+					}
+					m_networkMode = "ServerAuthoritative"
+					m_inputConnection = 
+					{
+						m_nodeID = 
+						{
+							m_id = 1488894277
+						}
+						m_outputID = 
+						{
+							m_id = 1488894277
+						}
+					}
+				}
+			},
+			{
+				key = 
+				{
+					m_id = 1922840513
+				}
+				value = 
+				{
+					_class = "CSequenceAnimNode"
+					m_sName = "Unnamed"
+					m_vecPosition = [ 461.0, 589.0 ]
+					m_nNodeID = 
+					{
+						m_id = 1922840513
+					}
+					m_networkMode = "ServerAuthoritative"
+					m_tagSpans = [  ]
+					m_paramSpans = [  ]
+					m_sequenceName = "song_selection_panel_anim"
+					m_playbackSpeed = 1.0
+					m_bLoop = false
+				}
+			},
+		]
+	}
+	m_componentManager = 
+	{
+		_class = "CAnimComponentManager"
+		m_components = [  ]
+	}
+	m_localParameters = 
+	[
+		{
+			_class = "CFloatAnimParameter"
+			m_name = "Progress"
+			m_group = ""
+			m_id = 
+			{
+				m_id = 1905320777
+			}
+			m_componentName = ""
+			m_previewButton = "ANIMPARAM_BUTTON_NONE"
+			m_bUseMostRecentValue = false
+			m_bAutoReset = false
+			m_eNetworkSetting = "Auto"
+			m_bGameWritable = true
+			m_bGraphWritable = true
+			m_bIsReferenced = false
+			m_bNetworkingRequested = false
+			m_fDefaultValue = 0.0
+			m_fMinValue = 0.0
+			m_fMaxValue = 1.0
+			m_bInterpolate = false
+		},
+	]
+	m_localTags = [  ]
+	m_referencedParamGroups = [  ]
+	m_referencedTagGroups = [  ]
+	m_pSettingsManager = 
+	{
+		_class = "CAnimGraphSettingsManager"
+		m_settingsGroups = 
+		[
+			{
+				_class = "CAnimGraphNetworkSettings"
+				m_bNetworkingEnabled = true
+			},
+		]
+	}
+	m_clipDataManager = 
+	{
+		_class = "CAnimClipDataManager"
+		m_itemTable = 
+		{
+		}
+	}
+	m_modelName = "models/song_selection_panel.vmdl"
+	m_previewModelName = ""
+}

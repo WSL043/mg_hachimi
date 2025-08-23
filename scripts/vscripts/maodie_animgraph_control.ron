@@ -649,6 +649,274 @@
                     )),
                     version: 3,
                 ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 20,
+                            version: 1,
+                        ),
+                        label: "Public Method",
+                        inputs: [
+                            ("name", (
+                                idx: 43,
+                                version: 1,
+                            )),
+                        ],
+                        outputs: [
+                            ("argument1", (
+                                idx: 20,
+                                version: 5,
+                            )),
+                            ("outAction", (
+                                idx: 19,
+                                version: 19,
+                            )),
+                        ],
+                        user_data: (
+                            template: CellPublicMethod,
+                            custom_named_outputs: {},
+                            input_hint_text: None,
+                            custom_output_type: None,
+                        ),
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 21,
+                            version: 3,
+                        ),
+                        label: "String to entity name",
+                        inputs: [
+                            ("entityName", (
+                                idx: 47,
+                                version: 3,
+                            )),
+                        ],
+                        outputs: [
+                            ("out", (
+                                idx: 26,
+                                version: 3,
+                            )),
+                        ],
+                        user_data: (
+                            template: StringToEntityName,
+                            custom_named_outputs: {},
+                            input_hint_text: None,
+                            custom_output_type: None,
+                        ),
+                    )),
+                    version: 3,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 22,
+                            version: 1,
+                        ),
+                        label: "Save variable",
+                        inputs: [
+                            ("ActionIn", (
+                                idx: 46,
+                                version: 3,
+                            )),
+                            ("variableName", (
+                                idx: 45,
+                                version: 3,
+                            )),
+                            ("value", (
+                                idx: 44,
+                                version: 3,
+                            )),
+                        ],
+                        outputs: [
+                            ("outAction", (
+                                idx: 27,
+                                version: 1,
+                            )),
+                        ],
+                        user_data: (
+                            template: SetVar,
+                            custom_named_outputs: {},
+                            input_hint_text: None,
+                            custom_output_type: None,
+                        ),
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 23,
+                            version: 1,
+                        ),
+                        label: "Public Method",
+                        inputs: [
+                            ("name", (
+                                idx: 48,
+                                version: 1,
+                            )),
+                        ],
+                        outputs: [
+                            ("argument1", (
+                                idx: 28,
+                                version: 1,
+                            )),
+                            ("outAction", (
+                                idx: 29,
+                                version: 1,
+                            )),
+                        ],
+                        user_data: (
+                            template: CellPublicMethod,
+                            custom_named_outputs: {},
+                            input_hint_text: None,
+                            custom_output_type: None,
+                        ),
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 24,
+                            version: 1,
+                        ),
+                        label: "Load variable",
+                        inputs: [
+                            ("variableName", (
+                                idx: 49,
+                                version: 1,
+                            )),
+                        ],
+                        outputs: [
+                            ("value", (
+                                idx: 30,
+                                version: 1,
+                            )),
+                        ],
+                        user_data: (
+                            template: GetVar,
+                            custom_named_outputs: {},
+                            input_hint_text: None,
+                            custom_output_type: Some(DOMAIN_ENTITY_NAME),
+                        ),
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 25,
+                            version: 1,
+                        ),
+                        label: "Find entity by name",
+                        inputs: [
+                            ("entName", (
+                                idx: 50,
+                                version: 1,
+                            )),
+                            ("entClass", (
+                                idx: 51,
+                                version: 1,
+                            )),
+                        ],
+                        outputs: [
+                            ("out", (
+                                idx: 31,
+                                version: 1,
+                            )),
+                        ],
+                        user_data: (
+                            template: FindEntByName,
+                            custom_named_outputs: {},
+                            input_hint_text: None,
+                            custom_output_type: None,
+                        ),
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 26,
+                            version: 1,
+                        ),
+                        label: "Set AnimGraph param",
+                        inputs: [
+                            ("ActionIn", (
+                                idx: 52,
+                                version: 1,
+                            )),
+                            ("hEntity", (
+                                idx: 53,
+                                version: 1,
+                            )),
+                            ("paramName", (
+                                idx: 54,
+                                version: 1,
+                            )),
+                            ("pParamValue", (
+                                idx: 55,
+                                version: 1,
+                            )),
+                        ],
+                        outputs: [
+                            ("outAction", (
+                                idx: 32,
+                                version: 1,
+                            )),
+                        ],
+                        user_data: (
+                            template: SetAnimGraphParam,
+                            custom_named_outputs: {},
+                            input_hint_text: None,
+                            custom_output_type: None,
+                        ),
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 27,
+                            version: 1,
+                        ),
+                        label: "Convert",
+                        inputs: [
+                            ("typefrom", (
+                                idx: 56,
+                                version: 1,
+                            )),
+                            ("typeto", (
+                                idx: 57,
+                                version: 1,
+                            )),
+                            ("entityclass", (
+                                idx: 58,
+                                version: 1,
+                            )),
+                            ("input", (
+                                idx: 59,
+                                version: 3,
+                            )),
+                        ],
+                        outputs: [
+                            ("out", (
+                                idx: 33,
+                                version: 3,
+                            )),
+                        ],
+                        user_data: (
+                            template: Convert,
+                            custom_named_outputs: {},
+                            input_hint_text: None,
+                            custom_output_type: None,
+                        ),
+                    )),
+                    version: 1,
+                ),
             ],
             inputs: [
                 (
@@ -1478,6 +1746,340 @@
                     )),
                     version: 5,
                 ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 43,
+                            version: 1,
+                        ),
+                        typ: String,
+                        value: String(
+                            value: "SetSongItem",
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 20,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 44,
+                            version: 3,
+                        ),
+                        typ: EntityName,
+                        value: EntityName(
+                            value: "",
+                        ),
+                        kind: ConnectionOrConstant,
+                        node: (
+                            idx: 22,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 3,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 45,
+                            version: 3,
+                        ),
+                        typ: InternalVariableName,
+                        value: InternalVariableName(
+                            prevvalue: "",
+                            value: "SongItem",
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 22,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 3,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 46,
+                            version: 3,
+                        ),
+                        typ: Action,
+                        value: Action,
+                        kind: ConnectionOnly,
+                        node: (
+                            idx: 22,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 3,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 47,
+                            version: 3,
+                        ),
+                        typ: String,
+                        value: String(
+                            value: "",
+                        ),
+                        kind: ConnectionOrConstant,
+                        node: (
+                            idx: 21,
+                            version: 3,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 3,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 48,
+                            version: 1,
+                        ),
+                        typ: String,
+                        value: String(
+                            value: "SetSongItemProgress",
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 23,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 49,
+                            version: 1,
+                        ),
+                        typ: InternalVariableName,
+                        value: InternalVariableName(
+                            prevvalue: "",
+                            value: "SongItem",
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 24,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 50,
+                            version: 1,
+                        ),
+                        typ: EntityName,
+                        value: EntityName(
+                            value: "",
+                        ),
+                        kind: ConnectionOrConstant,
+                        node: (
+                            idx: 25,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 51,
+                            version: 1,
+                        ),
+                        typ: String,
+                        value: String(
+                            value: "",
+                        ),
+                        kind: ConnectionOrConstant,
+                        node: (
+                            idx: 25,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 52,
+                            version: 1,
+                        ),
+                        typ: Action,
+                        value: Action,
+                        kind: ConnectionOnly,
+                        node: (
+                            idx: 26,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 53,
+                            version: 1,
+                        ),
+                        typ: EHandle,
+                        value: EHandle,
+                        kind: ConnectionOnly,
+                        node: (
+                            idx: 26,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 54,
+                            version: 1,
+                        ),
+                        typ: String,
+                        value: String(
+                            value: "Progress",
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 26,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 55,
+                            version: 1,
+                        ),
+                        typ: Any,
+                        value: Any,
+                        kind: ConnectionOnly,
+                        node: (
+                            idx: 26,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 56,
+                            version: 1,
+                        ),
+                        typ: Typ,
+                        value: Typ(
+                            value: PVAL_STRING(None),
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 27,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 57,
+                            version: 1,
+                        ),
+                        typ: Typ,
+                        value: Typ(
+                            value: PVAL_FLOAT(None),
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 27,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 58,
+                            version: 1,
+                        ),
+                        typ: String,
+                        value: String(
+                            value: "",
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 27,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 59,
+                            version: 3,
+                        ),
+                        typ: String,
+                        value: String(
+                            value: "",
+                        ),
+                        kind: ConnectionOrConstant,
+                        node: (
+                            idx: 27,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 3,
+                ),
             ],
             outputs: [
                 (
@@ -1737,12 +2339,32 @@
                     version: 1,
                 ),
                 (
-                    value: None,
-                    version: 18,
+                    value: Some((
+                        id: (
+                            idx: 19,
+                            version: 19,
+                        ),
+                        node: (
+                            idx: 20,
+                            version: 1,
+                        ),
+                        typ: Action,
+                    )),
+                    version: 19,
                 ),
                 (
-                    value: None,
-                    version: 4,
+                    value: Some((
+                        id: (
+                            idx: 20,
+                            version: 5,
+                        ),
+                        node: (
+                            idx: 20,
+                            version: 1,
+                        ),
+                        typ: String,
+                    )),
+                    version: 5,
                 ),
                 (
                     value: Some((
@@ -1811,6 +2433,118 @@
                             version: 3,
                         ),
                         typ: String,
+                    )),
+                    version: 3,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 26,
+                            version: 3,
+                        ),
+                        node: (
+                            idx: 21,
+                            version: 3,
+                        ),
+                        typ: EntityName,
+                    )),
+                    version: 3,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 27,
+                            version: 1,
+                        ),
+                        node: (
+                            idx: 22,
+                            version: 1,
+                        ),
+                        typ: Action,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 28,
+                            version: 1,
+                        ),
+                        node: (
+                            idx: 23,
+                            version: 1,
+                        ),
+                        typ: String,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 29,
+                            version: 1,
+                        ),
+                        node: (
+                            idx: 23,
+                            version: 1,
+                        ),
+                        typ: Action,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 30,
+                            version: 1,
+                        ),
+                        node: (
+                            idx: 24,
+                            version: 1,
+                        ),
+                        typ: EntityName,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 31,
+                            version: 1,
+                        ),
+                        node: (
+                            idx: 25,
+                            version: 1,
+                        ),
+                        typ: EHandle,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 32,
+                            version: 1,
+                        ),
+                        node: (
+                            idx: 26,
+                            version: 1,
+                        ),
+                        typ: Action,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 33,
+                            version: 3,
+                        ),
+                        node: (
+                            idx: 27,
+                            version: 1,
+                        ),
+                        typ: Scalar,
                     )),
                     version: 3,
                 ),
@@ -2083,13 +2817,117 @@
                     ]),
                     version: 5,
                 ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 26,
+                            version: 3,
+                        ),
+                    ]),
+                    version: 3,
+                ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 19,
+                            version: 19,
+                        ),
+                    ]),
+                    version: 3,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 20,
+                            version: 5,
+                        ),
+                    ]),
+                    version: 3,
+                ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 30,
+                            version: 1,
+                        ),
+                    ]),
+                    version: 1,
+                ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 29,
+                            version: 1,
+                        ),
+                    ]),
+                    version: 1,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 31,
+                            version: 1,
+                        ),
+                    ]),
+                    version: 1,
+                ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 33,
+                            version: 3,
+                        ),
+                    ]),
+                    version: 1,
+                ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 28,
+                            version: 1,
+                        ),
+                    ]),
+                    version: 3,
+                ),
             ],
         ),
         node_order: [
-            (
-                idx: 5,
-                version: 7,
-            ),
             (
                 idx: 1,
                 version: 3,
@@ -2143,10 +2981,6 @@
                 version: 3,
             ),
             (
-                idx: 17,
-                version: 5,
-            ),
-            (
                 idx: 19,
                 version: 3,
             ),
@@ -2162,6 +2996,46 @@
                 idx: 18,
                 version: 3,
             ),
+            (
+                idx: 5,
+                version: 7,
+            ),
+            (
+                idx: 17,
+                version: 5,
+            ),
+            (
+                idx: 20,
+                version: 1,
+            ),
+            (
+                idx: 21,
+                version: 3,
+            ),
+            (
+                idx: 22,
+                version: 1,
+            ),
+            (
+                idx: 23,
+                version: 1,
+            ),
+            (
+                idx: 24,
+                version: 1,
+            ),
+            (
+                idx: 25,
+                version: 1,
+            ),
+            (
+                idx: 27,
+                version: 1,
+            ),
+            (
+                idx: 26,
+                version: 1,
+            ),
         ],
         connection_in_progress: None,
         selected_nodes: [],
@@ -2173,136 +3047,192 @@
             ),
             (
                 value: Some((
-                    x: -82.920654,
-                    y: 363.9021,
+                    x: 137.44812,
+                    y: 369.57956,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: -99.325195,
-                    y: 183.23456,
+                    x: 126.45239,
+                    y: 248.47491,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 448.67786,
-                    y: -401.2099,
+                    x: 493.78973,
+                    y: -143.28992,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 315.83453,
-                    y: 157.38416,
+                    x: 404.74084,
+                    y: 231.14719,
                 )),
                 version: 11,
             ),
             (
                 value: Some((
-                    x: -42.08008,
-                    y: -362.74084,
+                    x: 164.8244,
+                    y: -117.50305,
                 )),
                 version: 7,
             ),
             (
                 value: Some((
-                    x: -121.023926,
-                    y: 39.216553,
+                    x: 111.90643,
+                    y: 151.93695,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 158.5108,
-                    y: 36.710754,
+                    x: 299.28424,
+                    y: 150.25763,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 600.63824,
-                    y: -70.68405,
+                    x: 595.6513,
+                    y: 78.26819,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: -71.42883,
-                    y: -99.62991,
+                    x: 145.15222,
+                    y: 58.864502,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 172.21075,
-                    y: 354.2964,
+                    x: 308.4688,
+                    y: 363.14108,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 587.5507,
-                    y: 275.65643,
+                    x: 586.878,
+                    y: 310.42694,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: -95.79999,
-                    y: 541.20056,
+                    x: 128.81543,
+                    y: 488.4266,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: -123.79999,
-                    y: 702.20056,
+                    x: 110.04663,
+                    y: 596.3473,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 270.24896,
-                    y: -140.25122,
+                    x: 374.18512,
+                    y: 31.63623,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 202.4538,
-                    y: -255.96793,
+                    x: 328.74042,
+                    y: -45.930603,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 223.20001,
-                    y: 510.20056,
+                    x: 342.64703,
+                    y: 467.64658,
                 )),
                 version: 19,
             ),
             (
                 value: Some((
-                    x: 360.2,
-                    y: 690.20056,
+                    x: 457.30768,
+                    y: 605.09503,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 582.2,
-                    y: 525.20056,
+                    x: 583.2912,
+                    y: 477.70175,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 119.20001,
-                    y: 695.20056,
+                    x: 272.93463,
+                    y: 591.6557,
                 )),
                 version: 3,
+            ),
+            (
+                value: Some((
+                    x: 72.49292,
+                    y: 730.0203,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 248.10052,
+                    y: 808.34546,
+                )),
+                version: 3,
+            ),
+            (
+                value: Some((
+                    x: 394.48206,
+                    y: 730.3201,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: -24.001099,
+                    y: 994.04675,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 55.448364,
+                    y: 1113.614,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 267.83783,
+                    y: 1126.2003,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 476.2943,
+                    y: 1007.4194,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 274.10504,
+                    y: 932.27295,
+                )),
+                version: 1,
             ),
         ],
         node_sizes: [
@@ -2443,14 +3373,70 @@
                 )),
                 version: 3,
             ),
+            (
+                value: Some((
+                    x: 200.0,
+                    y: 200.0,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 200.0,
+                    y: 200.0,
+                )),
+                version: 3,
+            ),
+            (
+                value: Some((
+                    x: 200.0,
+                    y: 200.0,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 699.3406,
+                    y: 200.0,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 200.0,
+                    y: 200.0,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 200.0,
+                    y: 200.0,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 200.0,
+                    y: 200.0,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 200.0,
+                    y: 200.0,
+                )),
+                version: 1,
+            ),
         ],
         node_finder: None,
         pan_zoom: (
             pan: (
-                x: 596.8,
-                y: 487.79944,
+                x: 415.8,
+                y: -142.20056,
             ),
-            zoom: 0.91886914,
+            zoom: 0.615936,
         ),
         _user_state: (),
     ),
@@ -2463,6 +3449,12 @@
                 data_type: EntityName,
                 default_value_buffer: "",
             ),
+            (
+                name: "SongItem",
+                typ_and_default_value: DOMAIN_ENTITY_NAME,
+                data_type: EntityName,
+                default_value_buffer: "",
+            ),
         ],
         exposed_nodes: [
             (
@@ -2471,6 +3463,7 @@
             ),
         ],
         outputs_dropdown_choices: [
+            PVAL_INT(None),
             PVAL_INT(None),
             PVAL_INT(None),
             PVAL_INT(None),

@@ -24,6 +24,93 @@ Instance.PublicMethod("HachimiStart", () => {
     inst.start();
 });
 
+class SongList {
+    COUNT = 12;
+
+    index: number = 0;
+
+    _displayIndex: number = 0;
+    _indexOffset: number = 0;
+
+    targetArray = charts;
+
+    private setItemProgress(index: number, progress: number) {
+        Instance.EntFireAtName("animgraph_ctrl", "SetSongItem", `song_item_${index}`);
+        Instance.EntFireAtName("animgraph_ctrl", 'SetSongItemProgress', progress);
+
+        Instance.Msg(`set ${index} to ${progress}`);
+    }
+
+    private setItemAlpha(index: number, alpha: number) {
+        Instance.EntFireAtName(`song_item_${index}`, "Alpha", alpha);
+    }
+
+    private setItemText(index: number, text: string) {
+        Instance.EntFireAtName(`song_text_${index}`, "SetMessage", text);
+    }
+
+    private setItemTextScale(index: number, scale: number) {
+        Instance.EntFireAtName(`song_text_${index}`, "SetScale", scale);
+    }
+
+    private calcIndexForItem(item: number) {
+        let itemPos = Math.floor(item + this._displayIndex) % this.COUNT;
+        const center = this.COUNT / 2 - 1;
+
+        const offset = center - itemPos;
+        let index = Math.floor(this._displayIndex + offset) + 1;
+
+        if (index >= this.targetArray.length) {
+            index %= this.targetArray.length;
+        } else if (index < 0) {
+            index = this.targetArray.length - (-index % this.targetArray.length);
+        }
+
+        return index;
+    }
+
+    onTick() {
+        if (this._displayIndex == this.index) {
+            return;
+        }
+
+        const velocity = (this.index - this._displayIndex) / 10;
+        this._displayIndex += velocity;
+
+        if (Math.abs(this._displayIndex - this.index) < 0.01) {
+            this._displayIndex = this.index;
+        }
+
+        for (let i = 0; i < this.COUNT; i++) {
+            const index = this.calcIndexForItem(i);
+
+            let itemPos = (i + this._displayIndex) % this.COUNT;
+            let progress = itemPos * (1 / this.COUNT);
+
+            if (progress < 0.075) {
+                this.setItemAlpha(i, 255 * progress / 0.075);
+                this.setItemTextScale(i, 0);
+            } else if (progress > 0.925) {
+                this.setItemAlpha(i, 255 * (1.0 - progress) / 0.075);
+                this.setItemTextScale(i, 0);
+            } else {
+                this.setItemAlpha(i, 255);
+                this.setItemText(i, charts[index].name);
+
+                if (progress > 0.45 && progress < 0.55) {
+                    this.setItemTextScale(i, 1.0 + (1.0 - (Math.abs(0.5 - progress) / 0.05)) * 0.4);
+                } else {
+                    this.setItemTextScale(i, 1);
+                }
+            }
+
+            this.setItemProgress(i, progress);
+        }
+    }
+}
+
+const list = new SongList();
+
 Instance.PublicMethod("HachimiMusicPrev", () => {
     const inst = HachimiGame.instance;
     if (!inst || !inst.postInited || !inst.musicStopped) {
@@ -35,6 +122,8 @@ Instance.PublicMethod("HachimiMusicPrev", () => {
     } else {
         inst.musicIndex--;
     }
+
+    list.index = inst.musicIndex;
 
     inst.updateMusic();
     inst.clearStatus();
@@ -51,6 +140,8 @@ Instance.PublicMethod("HachimiMusicNext", () => {
     } else {
         inst.musicIndex++;
     }
+
+    list.index = inst.musicIndex;
 
     inst.updateMusic();
     inst.clearStatus();
@@ -239,6 +330,7 @@ game.onTick(() => {
     }
 
     inst.onTick();
+    list.onTick();
 });
 
 let lastCfgSuffix = 0;
