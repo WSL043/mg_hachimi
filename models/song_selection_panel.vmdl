@@ -74,14 +74,40 @@
 				[
 					{
 						_class = "Attachment"
-						name = "center"
+						name = "title"
 						parent_bone = "tag_rb"
 						relative_origin = [ 1.0, -1.0, 0.0 ]
 						relative_angles = [ 0.0, 0.0, 0.0 ]
 						weight = 1.0
 						ignore_rotation = false
 					},
+					{
+						_class = "Attachment"
+						name = "chart"
+						parent_bone = "tag_rt"
+						relative_origin = [ 1.0, 1.0, 0.0 ]
+						relative_angles = [ 0.0, 0.0, 0.0 ]
+						weight = 1.0
+						ignore_rotation = false
+					},
 				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children = 
+				[
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = "tag_orgin"
+						surface_prop = "plastic"
+						collision_prop = "default"
+						tool_material = ""
+						origin = [ 0.051032, 0.007213, 0.0 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						dimensions = [ 25.362936, 5.021477, 1.0 ]
+					},
+				]
+				leave_body_collision_unmodified = false
 			},
 		]
 		model_archetype = ""

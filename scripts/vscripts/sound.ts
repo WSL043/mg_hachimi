@@ -22,7 +22,8 @@ export function createSoundEvent(soundName: string, startOnSpawn: boolean = fals
             Instance.EntFireAtName(soundTargetName, 'StartSound');
         },
         kill: () => {
+            Instance.EntFireAtName(soundTargetName, 'StopSound');
             Instance.EntFireAtName(soundTargetName, 'Kill');
-        }
+        },
     };
 }

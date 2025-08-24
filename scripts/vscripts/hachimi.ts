@@ -7,6 +7,7 @@ import { SoundEffect, createSoundEvent } from "./sound";
 import { JudgeTipController } from "./judge_tip_controller";
 import { HitmarkerController } from "./hitmarker_controller";
 import { Frame, JUDGE_POINT, Note, NotePool } from "./note";
+import { SongList } from "./song_list";
 
 function prependSpace(value: { toString: () => string }, count: number = 12) {
     return value.toString().padStart(count, ' ');
@@ -41,6 +42,8 @@ export class HachimiGame {
     _noteFrames: { frames: Frame[], note: number }[] | undefined = []
 
     _pool = new NotePool();
+
+    songList = new SongList(this);
 
     calculateNoteFrames(noteIndex: number, noteData: NoteData) {
         const self = this;
@@ -408,6 +411,8 @@ export class HachimiGame {
         this.hitmarkerController.onTick();
         this.headshotHitmarkerController.onTick();
 
+        this.songList.onTick();
+
         if (!this.postInited || this.musicStopped || !this._noteFrames) {
             return;
         }
@@ -508,6 +513,9 @@ export class HachimiGame {
             return;
         }
 
+        runServerCommand("say GET READY");
+
+        this.songList.stopPreview();
         this.canStart = false;
 
         this.applyChartOptions();
@@ -778,10 +786,10 @@ export class HachimiGame {
     }
 
     updateMusic() {
-        runServerCommand("say " + this.music.name);
         Instance.EntFireAtName("hachimi_monitor", "SetMaterialGroup", this.music.monitorBodygroup);
-        Instance.EntFireAtName("maodie_title_text", "SetMessage", this.music.name);
-        Instance.EntFireAtName("maodie_charter_text", "SetMessage", this.music.charter);
+        // Instance.EntFireAtName("maodie_title_text", "SetMessage", this.music.name);
+        // Instance.EntFireAtName("maodie_charter_text", "SetMessage", this.music.charter);
+        Instance.EntFireAtName("song_current_bv", "SetMessage", this.music.bv);
     }
 
     switchPlayerWeapon(name: string) {

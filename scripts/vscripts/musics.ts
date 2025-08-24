@@ -22,6 +22,7 @@ export interface Chart {
 
 export interface Music {
     name: string,
+    bv: string,
     charter: string,
     sndEvent: string,
     monitorBodygroup: number,

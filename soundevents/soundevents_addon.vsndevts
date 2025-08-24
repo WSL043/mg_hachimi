@@ -278,4 +278,12 @@
 		use_hrtf = 0.0
 		vsnd_files = "sounds/hitmarker_headshot.vsnd"
 	}
+
+	"effect.music_list_scoll" =
+	{
+		type = "csgo_music"
+		volume = 0.7
+		use_hrtf = 0.0
+		vsnd_files = "sounds/scroll.vsnd"
+	}
 }
