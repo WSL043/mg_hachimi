@@ -112,7 +112,7 @@ Instance.PublicMethod("Music_Begin", () => {
         bv: '',
         charter: '',
         sndEvent: '',
-        monitorBodygroup: 0,
+        monitorMaterialGroup: '0',
         sort: 99999999,
         chart: {
             BarLineList: [],
@@ -147,7 +147,7 @@ Instance.PublicMethod("Music_SetSoundEvent", (name: string) => {
 });
 
 Instance.PublicMethod("Music_SetCover", (cover: string) => {
-    currentMusic.monitorBodygroup = parseInt(cover);
+    currentMusic.monitorMaterialGroup = cover;
 });
 
 Instance.PublicMethod("Music_SetBarLines", (barLines: string) => {

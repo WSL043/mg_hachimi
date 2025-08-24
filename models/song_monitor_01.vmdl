@@ -327,6 +327,116 @@
 							},
 						]
 					},
+					{
+						_class = "MaterialGroup"
+						name = "lag_chimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/lag_chimi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "love_kills_hachimi_pure"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/love_kills_hachimi_pure.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "love_kills_hachimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/love_kills_hachimi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "other_side_mambo"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/other_side_mambo.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "vacuum_hachimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/vacuum_hachimi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "0xM00NL1GH7"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/0xm00nl1gh7.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "hachimi_tiancai"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/hachimi_tiancai.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "disassembly_required"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/disassembly_required.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "hachimi_potion"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/hachimi_potion.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "manbo_times"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/manbo_times.vmat"
+							},
+						]
+					},
 				]
 			},
 		]

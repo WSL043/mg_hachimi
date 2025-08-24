@@ -200,6 +200,86 @@
 		vsnd_files = "sounds/songs/under_hachimi_lights.vsnd"
 	}
 
+	"music.manbo_times" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/manbo_times.vsnd"
+	}
+
+	"music.lag_chimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.9
+		vsnd_files = "sounds/songs/lag_chimi.vsnd"
+	}
+
+	"music.love_kills_hachimi_pure" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/love_kills_hachimi_pure.vsnd"
+	}
+
+	"music.love_kills_hachimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/love_kills_hachimi.vsnd"
+	}
+
+	"music.other_side_mambo" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/other_side_mambo.vsnd"
+	}
+
+	"music.vacuum_hachimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/vacuum_hachimi.vsnd"
+	}
+	
+	"music.0xM00NL1GH7" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 1.0
+		vsnd_files = "sounds/songs/0xM00NL1GH7.vsnd"
+	}
+	
+	"music.hachimi_tiancai" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.9
+		vsnd_files = "sounds/songs/hachimi_tiancai.vsnd"
+	}
+	
+	"music.disassembly_required" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/disassembly_required.vsnd"
+	}
+	
+	"music.hachimi_potion" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/hachimi_potion.vsnd"
+	}
+
 	"effect.maodie_ha" =
 	{
 		type = "csgo_music"

@@ -423,7 +423,7 @@ export class HachimiGame {
             this.musicStarted = true;
 
             Instance.EntFireAtName('maodie_sound_player', 'StartSound');
-            runServerCommand("say play");
+            Instance.EntFireAtName("start_hint", "HideHudHint");
         }
 
         for (let i = this.lastNoteIndex; i < this.notes.length; i++) {
@@ -513,8 +513,9 @@ export class HachimiGame {
             return;
         }
 
-        runServerCommand("say GET READY");
+        runServerCommand("ent_fire start_hint showhudhint");
 
+        this.songList._previewStarted = true;
         this.songList.stopPreview();
         this.canStart = false;
 
@@ -746,7 +747,7 @@ export class HachimiGame {
             this.gameplayStatus.good * 1 +
             this.gameplayStatus.headshot;
         const percent = score / totalScore;
-        const rate = this.autoplay ? 'AUTOPLAY' : C.RATE_PRECENTS.find(v => v.percent <= percent)!.rate;
+        const rate = this.autoplay ? 'AUTOPLAY' : C.RATE_PRECENTS.find(v => v.percent < percent || Math.abs(v.percent - percent) < 0.001)!.rate;
 
         Instance.EntFireAtName("game_score", "SetMessage", score.toString());
         Instance.EntFireAtName("game_score_percent", "SetMessage", (percent * 100).toFixed(2) + '%');
@@ -786,7 +787,7 @@ export class HachimiGame {
     }
 
     updateMusic() {
-        Instance.EntFireAtName("hachimi_monitor", "SetMaterialGroup", this.music.monitorBodygroup);
+        Instance.EntFireAtName("hachimi_monitor", "SetMaterialGroup", this.music.monitorMaterialGroup);
         // Instance.EntFireAtName("maodie_title_text", "SetMessage", this.music.name);
         // Instance.EntFireAtName("maodie_charter_text", "SetMessage", this.music.charter);
         Instance.EntFireAtName("song_current_bv", "SetMessage", this.music.bv);

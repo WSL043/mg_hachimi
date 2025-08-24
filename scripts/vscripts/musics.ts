@@ -25,7 +25,7 @@ export interface Music {
     bv: string,
     charter: string,
     sndEvent: string,
-    monitorBodygroup: number,
+    monitorMaterialGroup: string,
     chart: Chart,
     sort: number,
 }
