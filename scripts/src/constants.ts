@@ -1,7 +1,9 @@
-const START_POINT = [1920, 736];
-const END_POINT = [576, 320];
-const DELTA = START_POINT.map((v, i) => v - END_POINT[i]);
-const TRACK_LENGTH = Math.sqrt(DELTA[0] * DELTA[0] + DELTA[1] * DELTA[1]);
+import { Vec } from "./utils/type_helper";
+
+const START_POINT = new Vec(1920, 736);
+const END_POINT = new Vec(576, 320);
+const DELTA = START_POINT.sub(END_POINT);
+const TRACK_LENGTH = DELTA.length;
 const JUDGE_LINE = 128;
 
 // const POOR_RANGE = 0.2;

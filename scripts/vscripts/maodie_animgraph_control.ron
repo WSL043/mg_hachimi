@@ -30,9 +30,9 @@
                         ],
                         user_data: (
                             template: GetVar,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: Some(DOMAIN_ENTITY_NAME),
+                            added_inputs: [],
                         ),
                     )),
                     version: 3,
@@ -62,9 +62,9 @@
                         ],
                         user_data: (
                             template: CellPublicMethod,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 5,
@@ -98,9 +98,9 @@
                         ],
                         user_data: (
                             template: SetVar,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 5,
@@ -138,9 +138,9 @@
                         ],
                         user_data: (
                             template: Convert,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 11,
@@ -170,9 +170,9 @@
                         ],
                         user_data: (
                             template: CellPublicMethod,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 7,
@@ -198,9 +198,9 @@
                         ],
                         user_data: (
                             template: GetVar,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: Some(DOMAIN_ENTITY_NAME),
+                            added_inputs: [],
                         ),
                     )),
                     version: 5,
@@ -230,9 +230,9 @@
                         ],
                         user_data: (
                             template: FindEntByName,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 5,
@@ -270,9 +270,9 @@
                         ],
                         user_data: (
                             template: SetAnimGraphParam,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 5,
@@ -302,9 +302,9 @@
                         ],
                         user_data: (
                             template: CellPublicMethod,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 5,
@@ -334,9 +334,9 @@
                         ],
                         user_data: (
                             template: FindEntByName,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -374,9 +374,9 @@
                         ],
                         user_data: (
                             template: SetAnimGraphParam,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -406,9 +406,9 @@
                         ],
                         user_data: (
                             template: CellPublicMethod,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 3,
@@ -434,9 +434,9 @@
                         ],
                         user_data: (
                             template: ConstantString,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 3,
@@ -474,9 +474,9 @@
                         ],
                         user_data: (
                             template: Convert,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 3,
@@ -502,9 +502,9 @@
                         ],
                         user_data: (
                             template: StringToEntityName,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -542,9 +542,9 @@
                         ],
                         user_data: (
                             template: Convert,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 19,
@@ -574,9 +574,9 @@
                         ],
                         user_data: (
                             template: FindEntByName,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 5,
@@ -614,9 +614,9 @@
                         ],
                         user_data: (
                             template: SetAnimGraphParam,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 3,
@@ -642,9 +642,9 @@
                         ],
                         user_data: (
                             template: StringToEntityName,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 3,
@@ -674,9 +674,9 @@
                         ],
                         user_data: (
                             template: CellPublicMethod,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -702,9 +702,9 @@
                         ],
                         user_data: (
                             template: StringToEntityName,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 3,
@@ -738,9 +738,9 @@
                         ],
                         user_data: (
                             template: SetVar,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -770,9 +770,9 @@
                         ],
                         user_data: (
                             template: CellPublicMethod,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -798,9 +798,9 @@
                         ],
                         user_data: (
                             template: GetVar,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: Some(DOMAIN_ENTITY_NAME),
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -830,9 +830,9 @@
                         ],
                         user_data: (
                             template: FindEntByName,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -870,9 +870,9 @@
                         ],
                         user_data: (
                             template: SetAnimGraphParam,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -910,9 +910,77 @@
                         ],
                         user_data: (
                             template: Convert,
-                            custom_named_outputs: {},
                             input_hint_text: None,
                             custom_output_type: None,
+                            added_inputs: [],
+                        ),
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 28,
+                            version: 1,
+                        ),
+                        label: "Public Method",
+                        inputs: [
+                            ("name", (
+                                idx: 60,
+                                version: 1,
+                            )),
+                        ],
+                        outputs: [
+                            ("argument1", (
+                                idx: 34,
+                                version: 1,
+                            )),
+                            ("outAction", (
+                                idx: 35,
+                                version: 1,
+                            )),
+                        ],
+                        user_data: (
+                            template: CellPublicMethod,
+                            input_hint_text: None,
+                            custom_output_type: None,
+                            added_inputs: [],
+                        ),
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 29,
+                            version: 1,
+                        ),
+                        label: "Fire output",
+                        inputs: [
+                            ("ActionIn", (
+                                idx: 61,
+                                version: 1,
+                            )),
+                            ("outputName", (
+                                idx: 62,
+                                version: 1,
+                            )),
+                            ("param", (
+                                idx: 63,
+                                version: 1,
+                            )),
+                        ],
+                        outputs: [
+                            ("outAction", (
+                                idx: 36,
+                                version: 1,
+                            )),
+                        ],
+                        user_data: (
+                            template: FireOutput,
+                            input_hint_text: None,
+                            custom_output_type: None,
+                            added_inputs: [],
                         ),
                     )),
                     version: 1,
@@ -2080,6 +2148,85 @@
                     )),
                     version: 3,
                 ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 60,
+                            version: 1,
+                        ),
+                        typ: String,
+                        value: String(
+                            value: "ScrIns",
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 28,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 61,
+                            version: 1,
+                        ),
+                        typ: Action,
+                        value: Action,
+                        kind: ConnectionOnly,
+                        node: (
+                            idx: 29,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 62,
+                            version: 1,
+                        ),
+                        typ: InternalOutputName,
+                        value: InternalOutputName(
+                            prevvalue: "",
+                            value: "Instruction",
+                        ),
+                        kind: ConstantOnly,
+                        node: (
+                            idx: 29,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 63,
+                            version: 1,
+                        ),
+                        typ: String,
+                        value: String(
+                            value: "",
+                        ),
+                        kind: ConnectionOrConstant,
+                        node: (
+                            idx: 29,
+                            version: 1,
+                        ),
+                        max_connections: Some(1),
+                        shown_inline: true,
+                    )),
+                    version: 1,
+                ),
             ],
             outputs: [
                 (
@@ -2548,6 +2695,48 @@
                     )),
                     version: 3,
                 ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 34,
+                            version: 1,
+                        ),
+                        node: (
+                            idx: 28,
+                            version: 1,
+                        ),
+                        typ: String,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 35,
+                            version: 1,
+                        ),
+                        node: (
+                            idx: 28,
+                            version: 1,
+                        ),
+                        typ: Action,
+                    )),
+                    version: 1,
+                ),
+                (
+                    value: Some((
+                        id: (
+                            idx: 36,
+                            version: 1,
+                        ),
+                        node: (
+                            idx: 29,
+                            version: 1,
+                        ),
+                        typ: Action,
+                    )),
+                    version: 1,
+                ),
             ],
             connections: [
                 (
@@ -2925,6 +3114,32 @@
                     ]),
                     version: 3,
                 ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 35,
+                            version: 1,
+                        ),
+                    ]),
+                    version: 1,
+                ),
+                (
+                    value: None,
+                    version: 0,
+                ),
+                (
+                    value: Some([
+                        (
+                            idx: 34,
+                            version: 1,
+                        ),
+                    ]),
+                    version: 1,
+                ),
             ],
         ),
         node_order: [
@@ -3036,6 +3251,14 @@
                 idx: 26,
                 version: 1,
             ),
+            (
+                idx: 28,
+                version: 1,
+            ),
+            (
+                idx: 29,
+                version: 1,
+            ),
         ],
         connection_in_progress: None,
         selected_nodes: [],
@@ -3047,190 +3270,204 @@
             ),
             (
                 value: Some((
-                    x: 137.44812,
-                    y: 369.57956,
+                    x: -355.7489,
+                    y: 763.1826,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 126.45239,
-                    y: 248.47491,
+                    x: -374.57434,
+                    y: 555.8303,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 493.78973,
-                    y: -143.28992,
+                    x: 254.3675,
+                    y: -114.93512,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 404.74084,
-                    y: 231.14719,
+                    x: 101.90045,
+                    y: 526.1616,
                 )),
                 version: 11,
             ),
             (
                 value: Some((
-                    x: 164.8244,
-                    y: -117.50305,
+                    x: -308.87482,
+                    y: -70.78363,
                 )),
                 version: 7,
             ),
             (
                 value: Some((
-                    x: 111.90643,
-                    y: 151.93695,
+                    x: -399.48114,
+                    y: 390.541,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 299.28424,
-                    y: 150.25763,
+                    x: -78.65857,
+                    y: 387.66623,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 595.6513,
-                    y: 78.26819,
+                    x: 428.7705,
+                    y: 264.40903,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 145.15222,
-                    y: 58.864502,
+                    x: -342.55798,
+                    y: 231.18552,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 308.4688,
-                    y: 363.14108,
+                    x: -62.932343,
+                    y: 752.15955,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 586.878,
-                    y: 310.42694,
+                    x: 413.74945,
+                    y: 661.90186,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 128.81543,
-                    y: 488.4266,
+                    x: -370.5298,
+                    y: 966.66675,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 110.04663,
-                    y: 596.3473,
+                    x: -402.66333,
+                    y: 1151.4435,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 374.18512,
-                    y: 31.63623,
+                    x: 49.585266,
+                    y: 184.5668,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 328.74042,
-                    y: -45.930603,
+                    x: -28.225006,
+                    y: 51.759857,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 342.64703,
-                    y: 467.64658,
+                    x: -4.414093,
+                    y: 931.0886,
                 )),
                 version: 19,
             ),
             (
                 value: Some((
-                    x: 457.30768,
-                    y: 605.09503,
+                    x: 191.90442,
+                    y: 1166.4215,
                 )),
                 version: 5,
             ),
             (
                 value: Some((
-                    x: 583.2912,
-                    y: 477.70175,
+                    x: 407.60986,
+                    y: 948.3064,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 272.93463,
-                    y: 591.6557,
+                    x: -123.77246,
+                    y: 1143.4104,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 72.49292,
-                    y: 730.0203,
+                    x: -466.96246,
+                    y: 1380.3164,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 248.10052,
-                    y: 808.34546,
+                    x: -166.29315,
+                    y: 1514.421,
                 )),
                 version: 3,
             ),
             (
                 value: Some((
-                    x: 394.48206,
-                    y: 730.3201,
+                    x: 84.335754,
+                    y: 1380.8275,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: -24.001099,
-                    y: 994.04675,
+                    x: -632.17755,
+                    y: 1832.3755,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 55.448364,
-                    y: 1113.614,
+                    x: -496.14404,
+                    y: 2037.0947,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 267.83783,
-                    y: 1126.2003,
+                    x: -132.49994,
+                    y: 2058.6455,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 476.2943,
-                    y: 1007.4194,
+                    x: 224.41309,
+                    y: 1855.2708,
                 )),
                 version: 1,
             ),
             (
                 value: Some((
-                    x: 274.10504,
-                    y: 932.27295,
+                    x: -121.76828,
+                    y: 1726.6069,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: -269.20764,
+                    y: -375.58298,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 49.07379,
+                    y: -378.56705,
                 )),
                 version: 1,
             ),
@@ -3429,19 +3666,39 @@
                 )),
                 version: 1,
             ),
+            (
+                value: Some((
+                    x: 232.06715,
+                    y: 200.0,
+                )),
+                version: 1,
+            ),
+            (
+                value: Some((
+                    x: 200.0,
+                    y: 200.0,
+                )),
+                version: 1,
+            ),
         ],
         node_finder: None,
         pan_zoom: (
             pan: (
-                x: 415.8,
-                y: -142.20056,
+                x: 287.8,
+                y: 494.5994,
             ),
-            zoom: 0.615936,
+            zoom: 1.0545845,
         ),
         _user_state: (),
     ),
     user_state: (
-        public_outputs: [],
+        public_outputs: [
+            (
+                name: "Instruction",
+                typ: PVAL_STRING(None),
+                typ_old: PVAL_STRING(None),
+            ),
+        ],
         variables: [
             (
                 name: "TargetName",
@@ -3468,6 +3725,10 @@
             PVAL_INT(None),
             PVAL_INT(None),
             PVAL_INT(None),
+            PVAL_INT(None),
         ],
+        save_file_path: None,
+        graph_domain: "ServerEntity",
+        graph_subtype: "PVAL_EHANDLE:point_pulse",
     ),
 )

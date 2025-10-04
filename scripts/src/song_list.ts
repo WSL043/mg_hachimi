@@ -1,8 +1,8 @@
-import { Instance } from "cspointscript";
+import { Instance } from "cs_script/point_script";
 import { HachimiGame } from "./hachimi";
 import { charts } from "./musics";
-import { createSoundEvent, SoundEffect } from "./sound";
-import { game, runServerCommand } from "s2ts/counter-strike";
+import { createSoundEvent, SoundEffect } from "./utils/sound";
+import { nextTick, scheduleTick } from "./utils/scheduler";
 
 export class SongList {
     COUNT = 12;
@@ -14,7 +14,7 @@ export class SongList {
 
     targetArray = charts;
 
-    _se: SoundEffect;
+    _se: SoundEffect | undefined = undefined;
     _preview: SoundEffect | undefined = undefined;
     _previewStarted = false;
 
@@ -23,32 +23,63 @@ export class SongList {
     constructor(
         private readonly game: HachimiGame
     ) {
-        this._se = createSoundEvent("effect.music_list_scoll");
+        createSoundEvent("effect.music_list_scoll")
+            .then(v => this._se = v);
+
+        scheduleTick(this.onTick.bind(this));
     }
 
     private setItemProgress(index: number, progress: number) {
-        Instance.EntFireAtName("animgraph_ctrl", "SetSongItem", `song_item_${index}`);
-        Instance.EntFireAtName("animgraph_ctrl", 'SetSongItemProgress', progress);
+        Instance.EntFireAtName({
+            name: 'pulseent',
+            input: "SetSongItem",
+            value: `song_item_${index}`
+        });
+        Instance.EntFireAtName({
+            name: "pulseent",
+            input: 'SetSongItemProgress',
+            value: progress
+        });
     }
 
     private setItemAlpha(index: number, alpha: number) {
-        Instance.EntFireAtName(`song_item_${index}`, "Alpha", alpha);
+        Instance.EntFireAtName({
+            name: `song_item_${index}`,
+            input: 'Alpha',
+            value: alpha,
+        });
     }
 
     private setItemText(index: number, text: string) {
-        Instance.EntFireAtName(`song_text_${index}`, "SetMessage", text);
+        Instance.EntFireAtName({
+            name: `song_text_${index}`,
+            input: "SetMessage",
+            value: text,
+        });
     }
 
     private setItemTextScale(index: number, scale: number) {
-        Instance.EntFireAtName(`song_text_${index}`, "SetScale", scale);
+        Instance.EntFireAtName({
+            name: `song_text_${index}`,
+            input: "SetScale",
+            value: scale,
+        });
     }
 
     private setItemChart(index: number, chart: string) {
-        Instance.EntFireAtName(`song_chart_${index}`, "SetMessage", chart);
+        Instance.EntFireAtName({
+            name: `song_chart_${index}`,
+            input: "SetMessage",
+            value: chart,
+        });
     }
 
     private setItemChartScale(index: number, scale: number) {
-        Instance.EntFireAtName(`song_chart_${index}`, "SetScale", scale);
+        Instance.EntFireAtName({
+            name: `song_chart_${index}`,
+            input: "SetScale",
+            value: scale,
+        });
     }
 
     private mod(n: number, m: number): number {
@@ -93,14 +124,12 @@ export class SongList {
         }
     }
 
-    onTick() {
+    async onTick() {
         if (this._displayIndex == this.index) {
             if (Instance.GetGameTime() - this._lastChangeTime > 1.0 && !this._previewStarted) {
                 this._previewStarted = true;
-                this._preview = createSoundEvent(this.game.music.sndEvent);
-                game.runNextTick(() => {
-                    this._preview?.play();
-                });
+                this._preview = await createSoundEvent(this.game.music.sndEvent);
+                this._preview.play();
             }
 
             return;
@@ -113,7 +142,7 @@ export class SongList {
 
         if (Math.round(this._displayIndex) != this._lastDisplayIndex) {
             this._lastDisplayIndex = Math.round(this._displayIndex);
-            this._se.play();
+            this._se?.play();
 
             this._previewStarted = false;
             this.game.musicIndex = this.realDisplayIndex;
@@ -126,7 +155,7 @@ export class SongList {
             this.game.updateMusic();
 
             this._lastChangeTime = Instance.GetGameTime();
-            runServerCommand("say " + this.game.music.name);
+            Instance.ServerCommand("say " + this.game.music.name);
         }
 
         for (let i = 0; i < this.COUNT; i++) {
@@ -145,8 +174,13 @@ export class SongList {
                 this.setItemChartScale(i, 0);
             } else {
                 this.setItemAlpha(i, 255);
-                this.setItemText(i, charts[index].name);
-                this.setItemChart(i, charts[index].charter);
+
+                const chart = charts[index];
+
+                if (chart) {
+                    this.setItemText(i, chart.name);
+                    this.setItemChart(i, chart.charter);
+                }
 
                 if (progress > 0.45 && progress < 0.55) {
                     this.setItemChartScale(i, (1.0 - (Math.abs(0.5 - progress) / 0.05)));

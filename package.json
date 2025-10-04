@@ -1,10 +1,30 @@
 {
-    "name": "mg_hachimi",
-    "version": "1.0.0",
-    "scripts": {
-        "start": "s2ts start"
-    },
-    "dependencies": {
-        "s2ts": "0.5.2"
-    }
+  "name": "mg_hachimi",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "cs_script"
+  ],
+  "homepage": "https://github.com/GEEKiDoS/mg_hachimi#readme",
+  "bugs": {
+    "url": "https://github.com/GEEKiDoS/mg_hachimi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GEEKiDoS/mg_hachimi.git"
+  },
+  "license": "MIT",
+  "author": "GEEKi",
+  "type": "module",
+  "main": "maps/scripts/main.vjs",
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^12.1.4",
+    "rollup": "^4.50.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.2"
+  }
 }

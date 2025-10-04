@@ -1,0 +1,1779 @@
+import { Instance } from 'cs_script/point_script';
+
+const onTicks = [];
+let delayActions = [];
+function tickCallback() {
+    for (const cb of onTicks) {
+        cb();
+    }
+    delayActions = delayActions.filter(act => {
+        if (act.targetTime > Instance.GetGameTime())
+            return true;
+        act.resolve();
+        return false;
+    });
+}
+function scheduleTick(callback) {
+    onTicks.push(callback);
+}
+function delaySec(sec) {
+    const targetTime = Instance.GetGameTime() + sec;
+    return new Promise((resolve) => {
+        delayActions.push({ targetTime, resolve });
+    });
+}
+function delay(msec) {
+    return delaySec(msec / 1000);
+}
+function nextTick() {
+    return new Promise((resolve) => {
+        delayActions.push({ targetTime: 0, resolve });
+    });
+}
+
+const charts = [];
+
+class Vec {
+    x;
+    y;
+    z;
+    constructor(x, y = 0, z = 0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    static from(input) {
+        if (typeof input === 'number') {
+            return new Vec(input, input, input);
+        }
+        if ('pitch' in input && 'yaw' in input && 'roll' in input) {
+            return new Vec(input.pitch, input.yaw, input.roll);
+        }
+        if ('x' in input && 'y' in input && 'z' in input) {
+            return new Vec(input.x, input.y, input.z);
+        }
+        return new Vec(input.r / 255, input.g / 255, input.b / 255);
+    }
+    static zero() {
+        return new Vec(0);
+    }
+    static one() {
+        return new Vec(1);
+    }
+    add(other) {
+        const { x, y, z } = this;
+        return new Vec(x + other.x, y + other.y, z + other.z);
+    }
+    sub(other) {
+        const { x, y, z } = this;
+        return new Vec(x - other.x, y - other.y, z - other.z);
+    }
+    dot(other) {
+        const { x, y, z } = this;
+        return x * other.x + y * other.y + z * other.z;
+    }
+    cross(right) {
+        const { x, y, z } = this;
+        return new Vec(y * right.z - z * right.y, z * right.x - x * right.z, x * right.y - y * right.x);
+    }
+    mul(factor) {
+        const { x, y, z } = this;
+        return new Vec(x * factor, y * factor, z * factor);
+    }
+    get length() {
+        return Math.sqrt(this.dot(this));
+    }
+    toString() {
+        return `${this.x} ${this.y} ${this.z}`;
+    }
+}
+
+const START_POINT = new Vec(1920, 736);
+const END_POINT = new Vec(576, 320);
+const DELTA = START_POINT.sub(END_POINT);
+const TRACK_LENGTH = DELTA.length;
+const JUDGE_LINE = 128;
+// const POOR_RANGE = 0.2;
+// const BAD_RANGE = 0.1166;
+// const GOOD_RANGE = 0.0833;
+// const GREAT_RANGE = 0.0667;
+// const PGREAT_RANGE = 0.0333;
+const JUDGE_RANGE_SETS = [{
+        POOR: 0.2,
+        BAD: 0.1166,
+        GOOD: 0.0833,
+        GREAT: 0.0667,
+        PGREAT: 0.0333,
+    }, {
+        POOR: 0.2,
+        BAD: 0.17,
+        GOOD: 0.0833 * 2,
+        GREAT: 0.0667 * 2,
+        PGREAT: 0.0333 * 2,
+    }];
+const JUDGE_TO_TEXT = ['PERFECT', 'GREAT', 'GOOD', 'BAD', 'POOR', 'UNKNOWN'];
+const OPTION_TO_TEXT = [undefined, 'MIRROR', 'RANDOM', 'R-RANDOM', 'S-RANDOM'];
+const JUDGE_OPTION_TO_TEXT = [undefined, 'EASY'];
+const WAIT_TIME = 0.25;
+const RATE_PRECENTS = [
+    { percent: 0.8889, rate: 'AAA' },
+    { percent: 0.7778, rate: 'AA' },
+    { percent: 0.6667, rate: 'A' },
+    { percent: 0.5556, rate: 'B' },
+    { percent: 0.4444, rate: 'C' },
+    { percent: 0.3333, rate: 'D' },
+    { percent: 0.2222, rate: 'E' },
+    { percent: -1, rate: 'F' },
+];
+const C = {
+    TRACK_LENGTH, JUDGE_LINE,
+    // POOR_RANGE, BAD_RANGE, GOOD_RANGE, GREAT_RANGE, PGREAT_RANGE,
+    JUDGE_RANGE_SETS,
+    WAIT_TIME, RATE_PRECENTS,
+    JUDGE_TO_TEXT, OPTION_TO_TEXT, JUDGE_OPTION_TO_TEXT
+};
+var Opt;
+(function (Opt) {
+    Opt[Opt["Off"] = 0] = "Off";
+    Opt[Opt["Mirror"] = 1] = "Mirror";
+    Opt[Opt["Random"] = 2] = "Random";
+    Opt[Opt["R_Random"] = 3] = "R_Random";
+    Opt[Opt["S_Random"] = 4] = "S_Random";
+})(Opt || (Opt = {}));
+var JudgeOpt;
+(function (JudgeOpt) {
+    JudgeOpt[JudgeOpt["Normal"] = 0] = "Normal";
+    JudgeOpt[JudgeOpt["Easy"] = 1] = "Easy";
+})(JudgeOpt || (JudgeOpt = {}));
+
+// requires sv_cheats 1
+Instance.ServerCommand("sv_cheats 1");
+let tmpIndex = 0;
+const createdEntites = [];
+async function createEntity(targetName, className, keyvalues = {}) {
+    const tmpName = "TMP_" +
+        Math.floor(Instance.GetGameTime() * 1000).toString() + "_" +
+        (tmpIndex++).toString();
+    keyvalues["targetname"] = tmpName;
+    const kvStr = Object.entries(keyvalues)
+        .filter(([, value]) => value !== undefined)
+        .map(([key, value]) => {
+        if (typeof value === "boolean") {
+            return [key, value ? "1" : "0"];
+        }
+        return [key, value];
+    })
+        .map(([key, value]) => `"${key}" "${value}"`)
+        .join(" ");
+    Instance.ServerCommand(`ent_create ${className} { ${kvStr} }`);
+    let ent = undefined;
+    do
+        await nextTick();
+    while ((ent = Instance.FindEntityByName(tmpName)) === undefined);
+    if (targetName)
+        ent.SetEntityName(targetName);
+    createdEntites.push(ent);
+    return ent;
+}
+async function removeAllEntities() {
+    for (const ent of createdEntites) {
+        if (ent.IsAlive())
+            ent.Kill();
+    }
+}
+
+const sounds = new Map();
+let seIndex = 0;
+async function createSoundEvent(soundName, startOnSpawn = false) {
+    const target = await createEntity(undefined, 'point_soundevent', {
+        soundName, startOnSpawn,
+    });
+    const index = seIndex++;
+    const se = {
+        play: () => {
+            Instance.EntFireAtTarget({ target, input: "StartSound" });
+        },
+        stop: () => {
+            Instance.EntFireAtTarget({ target, input: "StopSound" });
+        },
+        kill: () => {
+            Instance.EntFireAtTarget({ target, input: "StopSound" });
+            target.Kill();
+            sounds.delete(index);
+        },
+    };
+    if (startOnSpawn) {
+        se.play();
+    }
+    sounds.set(index, se);
+    return se;
+}
+function stopAllSound() {
+    sounds.forEach(v => {
+        v.stop();
+    });
+}
+
+class JudgeTipController {
+    targetname;
+    lastSetTime = 0;
+    constructor(targetname) {
+        this.targetname = targetname;
+        Instance.EntFireAtName({
+            name: this.targetname,
+            input: "SetScale",
+            value: 0
+        });
+    }
+    onTick() {
+        const now = Instance.GetGameTime();
+        if (now - this.lastSetTime > 1) {
+            if (now - this.lastSetTime < 1.2) {
+                const scale = 1.0 - ((now - this.lastSetTime - 1) / 0.2);
+                Instance.EntFireAtName({
+                    name: this.targetname,
+                    input: "SetScale",
+                    value: scale
+                });
+            }
+            else if (now - this.lastSetTime < 1.3) {
+                Instance.EntFireAtName({
+                    name: this.targetname,
+                    input: "SetScale",
+                    value: 0
+                });
+            }
+        }
+    }
+    setText(text) {
+        this.lastSetTime = Instance.GetGameTime();
+        Instance.EntFireAtName({
+            name: this.targetname,
+            input: 'SetMessage',
+            value: text
+        });
+        Instance.EntFireAtName({
+            name: this.targetname,
+            input: 'SetScale',
+            value: 1
+        });
+    }
+}
+
+class HitmarkerController {
+    targetName;
+    constructor(targetName) {
+        this.targetName = targetName;
+    }
+    started = false;
+    requestedStart = false;
+    show() {
+        this.requestedStart = true;
+    }
+    onTick() {
+        if (this.started) {
+            Instance.EntFireAtName({
+                name: this.targetName,
+                input: "Stop"
+            });
+            this.started = false;
+            return;
+        }
+        if (this.requestedStart) {
+            this.requestedStart = false;
+            Instance.EntFireAtName({
+                name: this.targetName,
+                input: "Start",
+            });
+            this.started = true;
+        }
+    }
+}
+
+const LANE_START = 1929;
+const LANE_HEIGHT = 740;
+const LEFT_LANE = 896;
+const SPACE = 64;
+const JUDGE_POINT = 0.93;
+let lastTargetName = '';
+function setAnimgraphParam(targetname, paramName, param) {
+    if (targetname != lastTargetName) {
+        Instance.EntFireAtName({
+            name: "pulseent",
+            input: "SetTarget",
+            value: targetname
+        });
+        lastTargetName = targetname;
+    }
+    Instance.EntFireAtName({
+        name: "pulseent",
+        input: `Set${paramName}`,
+        value: param,
+    });
+}
+class Note {
+    _body = null;
+    _head = null;
+    _blocker = null;
+    targetPos = Vec.zero();
+    async init(id) {
+        const targetname = "mt_" + id;
+        const targetname_head = "mt_h_" + id;
+        const targetname_blocker = "mt_bl_" + id;
+        [this._body, this._head, this._blocker] = await Promise.all([
+            createEntity(targetname, "prop_dynamic", {
+                origin: new Vec(1000, 9999, -100),
+                model: 'models/maodie_target.vmdl',
+                solid: 6,
+            }),
+            createEntity(targetname_head, "prop_dynamic", {
+                origin: new Vec(1000, 9999, -100),
+                model: 'models/maodie_target_head.vmdl',
+                solid: 6,
+            }),
+            createEntity(targetname_blocker, "prop_dynamic", {
+                origin: new Vec(1000, 9999, -100),
+                model: 'models/maodie_target_bullet_blocker.vmdl',
+                solid: 6,
+            }),
+        ]);
+        this._head.SetParent(this._body);
+        this._blocker.SetParent(this._body);
+        Instance.EntFireAtTarget({
+            target: this._head,
+            input: 'SetParentAttachment',
+            value: 'target',
+        });
+        Instance.EntFireAtTarget({
+            target: this._blocker,
+            input: 'SetParentAttachment',
+            value: 'target',
+        });
+        Instance.ConnectOutput(this._head, "OnTakeDamage", () => this._cb ? this._cb(0) : undefined);
+        Instance.ConnectOutput(this._body, "OnTakeDamage", () => this._cb ? this._cb(1) : undefined);
+    }
+    _up = false;
+    get up() {
+        return this._up;
+    }
+    set up(value) {
+        if (value == this._up) {
+            return;
+        }
+        setAnimgraphParam(this._body.GetEntityName(), "IsUp", value);
+        this._up = value;
+    }
+    _positon = 0.0;
+    get positon() {
+        return this._positon;
+    }
+    set positon(value) {
+        if (Math.abs(value - this._positon) < 0.001) {
+            return;
+        }
+        setAnimgraphParam(this._body.GetEntityName(), "Position", value);
+        this._positon = value;
+    }
+    set bodygroup(value) {
+        Instance.EntFireAtTarget({
+            target: this._head,
+            input: 'SetBodyGroup',
+            value: 'maodie,' + value,
+        });
+    }
+    _cb = undefined;
+    set onhit(cb) {
+        this._cb = cb;
+    }
+    _keyframes = [];
+    _frame = -1;
+    reset() {
+        this.up = false;
+        this.positon = 0;
+        this.bodygroup = 0;
+        this._cb = undefined;
+        this._keyframes = [];
+        this._frame = -1;
+    }
+    hide() {
+        Instance.EntFireAtTarget({
+            target: this._body,
+            input: "SetScale",
+            value: "0",
+        });
+        Instance.EntFireAtTarget({
+            target: this._head,
+            input: "SetScale",
+            value: "0",
+        });
+        Instance.EntFireAtTarget({
+            target: this._blocker,
+            input: "SetScale",
+            value: "0",
+        });
+        this._body.Teleport({
+            position: Vec.zero(),
+        });
+    }
+    show() {
+        Instance.EntFireAtTarget({
+            target: this._body,
+            input: "SetScale",
+            value: "1",
+        });
+        Instance.EntFireAtTarget({
+            target: this._head,
+            input: "SetScale",
+            value: "1",
+        });
+        Instance.EntFireAtTarget({
+            target: this._blocker,
+            input: "SetScale",
+            value: "1",
+        });
+        this._body.Teleport({
+            position: this.targetPos,
+        });
+    }
+    addFrame(keyframe) {
+        this._keyframes.push(keyframe);
+    }
+    setupFrames() {
+        this._keyframes.sort((a, b) => a.time - b.time);
+        let lastProgressFrame = null;
+        for (let i = 0; i < this._keyframes.length; i++) {
+            const frame = this._keyframes[i];
+            if (frame.progress !== undefined) {
+                // fill null progress before this frame
+                if (!lastProgressFrame) {
+                    for (let j = i - 1; j >= 0; j--) {
+                        this._keyframes[j].progress = frame.progress;
+                    }
+                }
+                lastProgressFrame = frame;
+                continue;
+            }
+            if (!lastProgressFrame) {
+                continue;
+            }
+            const nextframe = this._keyframes
+                .slice(i + 1)
+                .find(f => f.progress);
+            // if next frame not exists then use progress from last frame 
+            if (!nextframe) {
+                frame.progress = lastProgressFrame.progress;
+                continue;
+            }
+            const ratio = (frame.time - lastProgressFrame.time) / (nextframe.time - lastProgressFrame.time);
+            const additive = (nextframe.progress - lastProgressFrame.progress) * ratio;
+            frame.progress = lastProgressFrame.progress + additive;
+            continue;
+        }
+    }
+    clearFrames() {
+        this._keyframes = [];
+    }
+    onTick(time) {
+        if (!this._keyframes.length) {
+            // 请输入文本
+            return;
+        }
+        if (this._frame >= this._keyframes.length) {
+            return;
+        }
+        if (time < this._keyframes[0].time) {
+            const [frame] = this._keyframes;
+            this.positon = frame.progress;
+            this._frame = -1;
+            return;
+        }
+        let frameIndex = this._frame;
+        for (let i = Math.max(0, frameIndex); i < this._keyframes.length; i++) {
+            const frame = this._keyframes[i];
+            if (time < frame.time) {
+                frameIndex = i - 1;
+                break;
+            }
+            frameIndex = i;
+            if (i != this._frame) {
+                if (frame.isUp !== undefined) {
+                    this.up = frame.isUp;
+                }
+                if (frame.bodygroup !== undefined) {
+                    this.bodygroup = frame.bodygroup;
+                }
+                if (frame.callback) {
+                    frame.callback.bind(this)();
+                }
+            }
+        }
+        this._frame = frameIndex;
+        const frame = this._keyframes[frameIndex];
+        if (!frame) {
+            return;
+        }
+        const nextframe = this._keyframes[frameIndex + 1];
+        // reach end of keyframes
+        if (!nextframe) {
+            this.positon = frame.progress;
+            // use lastIndex + 1 to mark all frame has reached
+            this._frame = this._keyframes.length;
+            return;
+        }
+        const timediff = nextframe.time - frame.time;
+        const ratio = timediff ? (time - frame.time) / (nextframe.time - frame.time) : 0;
+        const additive = (nextframe.progress - frame.progress) * ratio;
+        this.positon = Math.min(Math.max(frame.progress + additive, 0), 1);
+    }
+}
+class NotePool {
+    _lastNoteIndex = 0;
+    _pool = [];
+    async rent(lane) {
+        let result = this._pool.pop();
+        if (!result) {
+            result = new Note();
+            await result.init(this._lastNoteIndex++);
+        }
+        result.reset();
+        result.targetPos = new Vec(LEFT_LANE + lane * SPACE, LANE_START, LANE_HEIGHT);
+        return result;
+    }
+    returnNote(note) {
+        note.hide();
+        note.reset();
+        this._pool.push(note);
+    }
+}
+
+class SongList {
+    game;
+    COUNT = 12;
+    index = 0;
+    _displayIndex = -999;
+    _lastDisplayIndex = -999;
+    targetArray = charts;
+    _se = undefined;
+    _preview = undefined;
+    _previewStarted = false;
+    _lastChangeTime = 0;
+    constructor(game) {
+        this.game = game;
+        createSoundEvent("effect.music_list_scoll")
+            .then(v => this._se = v);
+        scheduleTick(this.onTick.bind(this));
+    }
+    setItemProgress(index, progress) {
+        Instance.EntFireAtName({
+            name: 'pulseent',
+            input: "SetSongItem",
+            value: `song_item_${index}`
+        });
+        Instance.EntFireAtName({
+            name: "pulseent",
+            input: 'SetSongItemProgress',
+            value: progress
+        });
+    }
+    setItemAlpha(index, alpha) {
+        Instance.EntFireAtName({
+            name: `song_item_${index}`,
+            input: 'Alpha',
+            value: alpha,
+        });
+    }
+    setItemText(index, text) {
+        Instance.EntFireAtName({
+            name: `song_text_${index}`,
+            input: "SetMessage",
+            value: text,
+        });
+    }
+    setItemTextScale(index, scale) {
+        Instance.EntFireAtName({
+            name: `song_text_${index}`,
+            input: "SetScale",
+            value: scale,
+        });
+    }
+    setItemChart(index, chart) {
+        Instance.EntFireAtName({
+            name: `song_chart_${index}`,
+            input: "SetMessage",
+            value: chart,
+        });
+    }
+    setItemChartScale(index, scale) {
+        Instance.EntFireAtName({
+            name: `song_chart_${index}`,
+            input: "SetScale",
+            value: scale,
+        });
+    }
+    mod(n, m) {
+        return ((n % m) + m) % m;
+    }
+    calcIndexForItem(item) {
+        const itemPos = this.mod(Math.floor(item + this._displayIndex), this.COUNT);
+        const center = this.COUNT / 2 - 1;
+        const offset = center - itemPos;
+        return this.mod(Math.floor(this._displayIndex + offset) + 1, this.targetArray.length);
+    }
+    get realIndex() {
+        return this.mod(this.index, this.targetArray.length);
+    }
+    get realDisplayIndex() {
+        return this.mod(this._lastDisplayIndex, this.targetArray.length);
+    }
+    setIndex(targetReal) {
+        const currentReal = this.realIndex;
+        const total = this.targetArray.length;
+        if (total === 0)
+            return;
+        let diff = targetReal - currentReal;
+        if (diff > total / 2) {
+            diff -= total;
+        }
+        else if (diff < -total / 2) {
+            diff += total;
+        }
+        this.index += diff;
+    }
+    stopPreview() {
+        if (this._preview) {
+            this._preview.kill();
+            this._preview = undefined;
+        }
+    }
+    async onTick() {
+        if (this._displayIndex == this.index) {
+            if (Instance.GetGameTime() - this._lastChangeTime > 1.0 && !this._previewStarted) {
+                this._previewStarted = true;
+                this._preview = await createSoundEvent(this.game.music.sndEvent);
+                this._preview.play();
+            }
+            return;
+        }
+        this.stopPreview();
+        const velocity = (this.index - this._displayIndex) / 10;
+        this._displayIndex += velocity;
+        if (Math.round(this._displayIndex) != this._lastDisplayIndex) {
+            this._lastDisplayIndex = Math.round(this._displayIndex);
+            this._se?.play();
+            this._previewStarted = false;
+            this.game.musicIndex = this.realDisplayIndex;
+            this.game.updateMusic();
+        }
+        if (Math.abs(this._displayIndex - this.index) < 0.01) {
+            this._displayIndex = this.index;
+            this.game.musicIndex = this.realIndex;
+            this.game.updateMusic();
+            this._lastChangeTime = Instance.GetGameTime();
+            Instance.ServerCommand("say " + this.game.music.name);
+        }
+        for (let i = 0; i < this.COUNT; i++) {
+            const index = this.calcIndexForItem(i);
+            const itemPos = this.mod(i + this._displayIndex, this.COUNT);
+            const progress = itemPos * (1 / this.COUNT);
+            if (progress < 0.2) {
+                this.setItemAlpha(i, 255 * progress / 0.2);
+                this.setItemTextScale(i, 0);
+                this.setItemChartScale(i, 0);
+            }
+            else if (progress > 0.8) {
+                this.setItemAlpha(i, 255 * (1.0 - progress) / 0.2);
+                this.setItemTextScale(i, 0);
+                this.setItemChartScale(i, 0);
+            }
+            else {
+                this.setItemAlpha(i, 255);
+                const chart = charts[index];
+                if (chart) {
+                    this.setItemText(i, chart.name);
+                    this.setItemChart(i, chart.charter);
+                }
+                if (progress > 0.45 && progress < 0.55) {
+                    this.setItemChartScale(i, (1.0 - (Math.abs(0.5 - progress) / 0.05)));
+                }
+                else {
+                    this.setItemChartScale(i, 0);
+                }
+                this.setItemTextScale(i, 1);
+            }
+            this.setItemProgress(i, progress);
+        }
+    }
+}
+
+function prependSpace(value, count = 12) {
+    return value.toString().padStart(count, ' ');
+}
+class HachimiGame {
+    static instance = undefined;
+    static init() {
+        return this.instance = new HachimiGame();
+    }
+    trackTime = 1.25;
+    judgeOffset = 0;
+    musicIndex = 0;
+    get speed() {
+        return (C.TRACK_LENGTH - C.JUDGE_LINE) / this.trackTime;
+    }
+    get music() {
+        return charts[this.musicIndex];
+    }
+    autoplay = false;
+    option = Opt.Off;
+    judgeOption = JudgeOpt.Normal;
+    hitmarker = true;
+    _lastMusicIndex = -1;
+    _lastOption = Opt.Off;
+    _moddedChart;
+    _noteFrames = [];
+    _pool = new NotePool();
+    songList = new SongList(this);
+    calculateNoteFrames(noteIndex, noteData) {
+        const self = this;
+        const noteTime = noteData.Time;
+        const playerSpeed = JUDGE_POINT / this.trackTime;
+        let time = noteTime;
+        let progress = JUDGE_POINT;
+        // Generate all frames until first soflan data
+        // soflan data is ordered in descending
+        let frames = [];
+        for (let i = this.soflans.findIndex(s => s.Time < noteTime); i < this.soflans.length; i++) {
+            frames.push({
+                time,
+                progress,
+            });
+            const soflanData = this.soflans[i];
+            let speed = playerSpeed * soflanData.Speed;
+            progress -= speed * (time - soflanData.Time);
+            time = soflanData.Time;
+        }
+        frames.push({
+            time,
+            progress,
+        });
+        frames.sort((a, b) => a.time - b.time);
+        const strippedFrames = [];
+        // find the first appear time (progress in [0, 1]) from generated frames
+        for (let i = 0; i < frames.length - 1; i++) {
+            const f1 = frames[i];
+            const f2 = frames[i + 1];
+            const p1 = f1.progress;
+            const p2 = f2.progress;
+            const s = p2 - p1;
+            const t = f2.time - f1.time;
+            if (p1 < 0 && p2 > 0) {
+                strippedFrames.push({
+                    time: f1.time + ((0 - p1) / s) * t,
+                    progress: 0,
+                });
+            }
+            else if (p1 > 1 && p2 < 1) {
+                strippedFrames.push({
+                    time: f1.time + ((1 - p1) / s) * t,
+                    progress: 1,
+                });
+            }
+            else {
+                continue;
+            }
+            strippedFrames.push(...frames.slice(i + 1));
+            break;
+        }
+        // merge frames that space < 0.016 (1 frame)
+        for (let i = strippedFrames.length - 2; i >= 0; i--) {
+            const f1 = strippedFrames[i];
+            const f2 = strippedFrames[i + 1];
+            if (f2.time - f1.time > 0.016) {
+                continue;
+            }
+            // remove f1
+            strippedFrames.splice(i, 1);
+        }
+        // generate additional frames
+        for (let i = strippedFrames.length - 2; i >= 0; i--) {
+            const f1 = strippedFrames[i];
+            const f2 = strippedFrames[i + 1];
+            const p1 = f1.progress;
+            const p2 = f2.progress;
+            const s = p2 - p1;
+            const t = f2.time - f1.time;
+            const v = s / t;
+            // show
+            if (p1 <= 0 && p2 > 0) {
+                strippedFrames.push({
+                    time: f1.time + ((0 - p1) / s) * t - C.WAIT_TIME,
+                    isUp: true,
+                    callback: function () {
+                        this.show();
+                    },
+                });
+            }
+            if (p1 >= 1 && p2 < 1) {
+                strippedFrames.push({
+                    time: f1.time + ((1 - p1) / s) * t - C.WAIT_TIME,
+                    isUp: true,
+                    callback: function () {
+                        this.show();
+                    },
+                });
+            }
+            // hide
+            if (p2 <= 0 && p1 > 0) {
+                strippedFrames.push({
+                    time: f1.time + ((0 - p1) / s) * t - C.WAIT_TIME,
+                    isUp: false,
+                    callback: function () {
+                        this.hide();
+                    },
+                });
+            }
+            if (p2 >= 1 && p1 < 1) {
+                strippedFrames.push({
+                    time: f1.time + ((1 - p1) / s) * t - C.WAIT_TIME,
+                    isUp: false,
+                    callback: function () {
+                        this.hide();
+                    },
+                });
+            }
+            if (f2.time == noteTime) {
+                // stop
+                if (this.autoplay) {
+                    f2.callback = function () {
+                        self.processKilledTarget({
+                            index: noteIndex,
+                            where: 0,
+                            note: this,
+                        });
+                    };
+                }
+                else {
+                    strippedFrames.push({
+                        time: f2.time + C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
+                        progress: p2 + v * C.JUDGE_RANGE_SETS[this.judgeOption].POOR,
+                        callback: function () {
+                            self.haEffect.play();
+                            self.processKilledTarget({
+                                index: noteIndex,
+                                where: 2,
+                                note: this,
+                            });
+                        }
+                    });
+                }
+                // change material
+                strippedFrames.push({
+                    time: noteTime - C.JUDGE_RANGE_SETS[this.judgeOption].GOOD,
+                    bodygroup: 2,
+                });
+            }
+        }
+        strippedFrames.sort((a, b) => a.time - b.time);
+        return strippedFrames;
+    }
+    applyChartOptions() {
+        this._moddedChart = JSON.parse(JSON.stringify(this.music.chart));
+        this._moddedChart.NoteDataList = this._moddedChart.NoteDataList.sort((a, b) => a.Time - b.Time);
+        this._moddedChart.SoflanDataList = this._moddedChart.SoflanDataList.sort((a, b) => b.Time - a.Time);
+        this._moddedChart.WeaponDataList = this._moddedChart.WeaponDataList.sort((a, b) => b.Time - a.Time);
+        const notes = this._moddedChart.NoteDataList;
+        this._noteFrames = [];
+        for (let i = 0; i < notes.length; i++) {
+            const frames = this.calculateNoteFrames(i, notes[i]);
+            this._noteFrames.push({ frames, note: i });
+        }
+        this._noteFrames.sort((a, b) => a.frames[0].time - b.frames[0].time);
+        if (!this.option) {
+            return;
+        }
+        this._lastMusicIndex = this.musicIndex;
+        this._lastOption = this.option;
+        if (this.option < Opt.S_Random) {
+            let laneMap = [0, 1, 2, 3, 4, 5, 6];
+            if (this.option == Opt.Mirror) {
+                laneMap.reverse();
+            }
+            else if (this.option == Opt.Random) {
+                let i = 7;
+                while (i > 0) {
+                    const j = Math.floor(Math.random() * i);
+                    i--;
+                    [laneMap[i], laneMap[j]] = [laneMap[j], laneMap[i]];
+                }
+            }
+            else if (this.option == Opt.R_Random) {
+                const shift = 1 + Math.floor(Math.random() * 6);
+                for (let i = 0; i < shift; i++) {
+                    laneMap.push(laneMap.shift());
+                }
+            }
+            for (const note of notes) {
+                note.LaneId = laneMap[note.LaneId];
+            }
+            Instance.ServerCommand("say \"" + C.OPTION_TO_TEXT[this.option] + ": " + [0, 1, 2, 3, 4, 5, 6]
+                .map(v => laneMap[v] + 1)
+                .join('') + "\"");
+        }
+        else if (this.option == Opt.S_Random) {
+            for (const note of notes) {
+                note.LaneId = Math.floor(Math.random() * 7);
+            }
+        }
+        Instance.ServerCommand("say Applyed " + C.OPTION_TO_TEXT[this.option]);
+    }
+    get chart() {
+        if (!this._moddedChart) {
+            throw new Error("using chart before apply options.");
+        }
+        return this._moddedChart;
+    }
+    get notes() {
+        return this.chart.NoteDataList;
+    }
+    get soflans() {
+        return this.chart.SoflanDataList;
+    }
+    get weapons() {
+        return this.chart.WeaponDataList;
+    }
+    get musicName() {
+        return this.music.name;
+    }
+    get musicSndEvent() {
+        return this.music.sndEvent;
+    }
+    static lastTemplateSuffix = 1;
+    lastTrySuffix = HachimiGame.lastTemplateSuffix;
+    postInited = false;
+    killedObjects = [];
+    lastNoteTimes = new Map();
+    noteObjs = [];
+    lastTime = 0;
+    musicStartTime = 0;
+    lastNoteIndex = 0;
+    lastWeaponIndex = 0;
+    musicStarted = false;
+    musicStopped = true;
+    canStart = false;
+    hardStopped = false;
+    noteProgress = 0;
+    gameplayStatus = {
+        perfect: 0,
+        great: 0,
+        good: 0,
+        bad: 0,
+        poor: 0,
+        headshot: 0,
+        bodyshot: 0,
+        combo: 0,
+        maxcombo: 0,
+        offset: 0,
+        late: 0,
+        early: 0,
+    };
+    judgeTipControllers = [];
+    combobreakEffect = null;
+    comboEffects = [];
+    haEffect = null;
+    hitmarkerEffect = null;
+    headshotHitmarkerEffect = null;
+    hitmarkerController = new HitmarkerController("hitmarker_particle");
+    headshotHitmarkerController = new HitmarkerController("hitmarker_particle_headshot");
+    _soundPlayer;
+    constructor() {
+        this.postInited = true;
+        Instance.EntFireAtName({
+            name: 'maodie_start_text',
+            input: 'SetMessage',
+            value: "PRESS TO START"
+        });
+        for (let i = 0; i < 7; i++) {
+            this.judgeTipControllers.push(new JudgeTipController('maodie_judge_tip_' + i));
+        }
+        Promise.all([
+            createSoundEvent('effect.maodie_ha'),
+            createSoundEvent('effect.hitmarker'),
+            createSoundEvent('effect.hitmarker_headshot'),
+            createSoundEvent('effect.siren_laugh'),
+            Promise.all(['effect.wow', 'effect.manbo', 'effect.oye'].map(v => createSoundEvent(v)))
+        ]).then(values => {
+            [
+                this.haEffect,
+                this.hitmarkerEffect,
+                this.headshotHitmarkerEffect,
+                this.combobreakEffect,
+                this.comboEffects
+            ] = values;
+        });
+        Instance.ServerCommand("exec music_list.cfg");
+        this.updateText();
+        this.updateMusic();
+        this.clearStatus();
+        this.canStart = true;
+        Instance.ServerCommand("say Ready");
+    }
+    get time() {
+        return Instance.GetGameTime() - this.musicStartTime;
+    }
+    async spawnMaodie(spawnPoint, noteIndex, frames) {
+        if (spawnPoint < 0 || spawnPoint > 6) {
+            Instance.Msg("invalid spawn point " + spawnPoint);
+            return;
+        }
+        const note = await this._pool.rent(spawnPoint);
+        frames.forEach(f => note.addFrame(f));
+        note.setupFrames();
+        if (!this.autoplay) {
+            note.onhit = (where) => {
+                this.onTargetKilled(noteIndex, where, note);
+            };
+        }
+        this.noteObjs.push(note);
+    }
+    onTick() {
+        this.processKilledTargets();
+        this.noteObjs.forEach(v => v.onTick(this.time));
+        this.judgeTipControllers.forEach(v => v.onTick());
+        this.hitmarkerController.onTick();
+        this.headshotHitmarkerController.onTick();
+        this.songList.onTick();
+        if (!this.postInited || this.musicStopped || !this._noteFrames) {
+            return;
+        }
+        const musicTime = this.time;
+        if (musicTime > 0 && !this.musicStarted) {
+            this.musicStarted = true;
+            this._soundPlayer?.play();
+            Instance.EntFireAtName({
+                name: "start_hint",
+                input: "HideHudHint",
+            });
+        }
+        for (let i = this.lastNoteIndex; i < this.notes.length; i++) {
+            const note = this._noteFrames[i];
+            const firstTime = note.frames[0].time;
+            const noteData = this.notes[note.note];
+            if (musicTime < firstTime - 0.1) {
+                break;
+            }
+            this.spawnMaodie(noteData.LaneId, i, note.frames);
+            this.lastNoteIndex++;
+        }
+        for (let i = this.lastWeaponIndex; i < this.weapons.length; i++) {
+            const weapon = this.weapons[i];
+            if (musicTime < weapon.Time) {
+                break;
+            }
+            this.switchPlayerWeapon(weapon.Weapon);
+            this.lastWeaponIndex++;
+        }
+        if (this.lastNoteIndex >= this.notes.length) {
+            this.stop(true);
+        }
+    }
+    stop(soft = false) {
+        if (this.musicStopped) {
+            return;
+        }
+        Instance.EntFireAtName({
+            name: "stop_button",
+            input: "Alpha",
+            value: 0,
+        });
+        Instance.EntFireAtName({
+            name: 'maodie_start_text',
+            input: 'SetMessage',
+            value: "PRESS TO START",
+        });
+        if (!soft) {
+            this._soundPlayer?.kill();
+            this.noteObjs.forEach(v => this._pool.returnNote(v));
+            this.noteObjs = [];
+            this.hardStopped = true;
+        }
+        this.musicStopped = true;
+        this.canStart = true;
+    }
+    clearStatus() {
+        this.noteProgress = 0;
+        this.gameplayStatus = {
+            perfect: 0,
+            great: 0,
+            good: 0,
+            bad: 0,
+            poor: 0,
+            headshot: 0,
+            bodyshot: 0,
+            combo: 0,
+            maxcombo: 0,
+            offset: 0,
+            late: 0,
+            early: 0,
+        };
+        this.updateText();
+    }
+    async start() {
+        if (!this.postInited) {
+            Instance.ServerCommand("say Not ready yet.");
+            return;
+        }
+        if (!this.musicStopped) {
+            return;
+        }
+        if (!this.canStart) {
+            return;
+        }
+        Instance.EntFireAtName({
+            name: "start_hint",
+            input: "ShowHudHint",
+        });
+        this.songList._previewStarted = true;
+        this.songList.stopPreview();
+        this.canStart = false;
+        this.applyChartOptions();
+        Instance.EntFireAtName({
+            name: 'maodie_start_text',
+            input: 'SetMessage',
+            value: "GET READY"
+        });
+        const barTime = this.chart.BarLineList[1] - this.chart.BarLineList[0];
+        const tickTime = barTime / 4;
+        let blankTime = -(this.chart.BarLineList[0] - (barTime * 2));
+        while (blankTime < 0 ||
+            blankTime < barTime * 2 ||
+            blankTime < -Math.min(0, this._noteFrames[0].frames[0].time)) {
+            blankTime += barTime;
+        }
+        this.clearStatus();
+        this.lastNoteTimes.clear();
+        const lastLaneNoteTimes = [-1, -1, -1, -1, -1, -1, -1];
+        for (let i = 0; i < this.notes.length; i++) {
+            const note = this.notes[i];
+            this.lastNoteTimes.set(i, lastLaneNoteTimes[note.LaneId]);
+            lastLaneNoteTimes[note.LaneId] = note.Time;
+        }
+        Instance.EntFireAtName({
+            name: "fc_indicator",
+            input: "Enable",
+        });
+        Instance.EntFireAtName({
+            name: "ah_indicator",
+            input: "Enable",
+        });
+        await nextTick();
+        this._soundPlayer = await createSoundEvent(this.musicSndEvent);
+        this.musicStartTime = Instance.GetGameTime() + blankTime;
+        this.musicStopped = false;
+        this.musicStarted = false;
+        this.hardStopped = false;
+        this.lastNoteIndex = 0;
+        this.lastWeaponIndex = 0;
+        this.updateText();
+        for (let i = 1; i <= 4; i++) {
+            delaySec(blankTime - (tickTime * i)).then(() => {
+                if (this.hardStopped) {
+                    return;
+                }
+                this.haEffect.play();
+            });
+        }
+        Instance.EntFireAtName({
+            name: "stop_button",
+            input: "Alpha",
+            value: 255,
+        });
+    }
+    onTargetKilled(index, where, note) {
+        if (this.killedObjects.find(v => v.index == index)) {
+            return;
+        }
+        this.killedObjects.push({ index, where, note });
+    }
+    processKilledTargets() {
+        const sorted = this.killedObjects
+            .sort((a, b) => {
+            return this.notes[a.index].Time -
+                this.notes[b.index].Time;
+        });
+        for (const obj of sorted) {
+            this.processKilledTarget(obj);
+        }
+        this.killedObjects = [];
+    }
+    processKilledTarget({ index, where, note: noteObj }) {
+        const note = this.notes[index];
+        const lastNoteTime = this.lastNoteTimes.get(index);
+        const offset = note.Time - this.time - this.judgeOffset;
+        if (offset > C.JUDGE_RANGE_SETS[this.judgeOption].POOR) {
+            return true;
+        }
+        const judgeDelta = Math.abs(offset);
+        if (judgeDelta > C.JUDGE_RANGE_SETS[JudgeOpt.Normal].PGREAT && lastNoteTime && lastNoteTime != -1) {
+            const minJudgeTime = lastNoteTime + (note.Time - lastNoteTime) / 2 - this.judgeOffset;
+            if (this.time - this.judgeOffset < minJudgeTime) {
+                return true;
+            }
+        }
+        const judgement = (() => {
+            if (judgeDelta < C.JUDGE_RANGE_SETS[this.judgeOption].PGREAT) {
+                this.gameplayStatus.perfect++;
+                return 0;
+            }
+            else if (judgeDelta < C.JUDGE_RANGE_SETS[this.judgeOption].GREAT) {
+                this.gameplayStatus.great++;
+                return 1;
+            }
+            else if (judgeDelta < C.JUDGE_RANGE_SETS[this.judgeOption].GOOD) {
+                this.gameplayStatus.good++;
+                return 2;
+            }
+            else if (judgeDelta < C.JUDGE_RANGE_SETS[this.judgeOption].BAD) {
+                this.gameplayStatus.bad++;
+                return 3;
+            }
+            this.gameplayStatus.poor++;
+            return 4;
+        })();
+        if (judgement != 4) {
+            this.gameplayStatus.offset = (this.gameplayStatus.offset + offset) / 2;
+        }
+        if (judgement > 0 && judgement < 4) {
+            if (offset > 0) {
+                this.gameplayStatus.early++;
+            }
+            else {
+                this.gameplayStatus.late++;
+            }
+        }
+        if (where == 0) {
+            this.gameplayStatus.headshot++;
+        }
+        else if (where == 1) {
+            this.gameplayStatus.bodyshot++;
+        }
+        if (judgement <= 2) {
+            if (this.hitmarker) {
+                if (where == 0) {
+                    this.headshotHitmarkerController.show();
+                    this.headshotHitmarkerEffect.play();
+                }
+                else {
+                    this.hitmarkerController.show();
+                    this.hitmarkerEffect.play();
+                }
+            }
+            this.gameplayStatus.combo++;
+            if (this.gameplayStatus.combo > this.gameplayStatus.maxcombo) {
+                this.gameplayStatus.maxcombo = this.gameplayStatus.combo;
+            }
+        }
+        else {
+            if (this.gameplayStatus.combo > 10) {
+                this.combobreakEffect.play();
+            }
+            this.gameplayStatus.combo = 0;
+        }
+        if (this.gameplayStatus.combo > 5) {
+            this.judgeTipControllers[note.LaneId].setText(`${this.gameplayStatus.combo}\n${C.JUDGE_TO_TEXT[judgement]}`);
+            if ((this.gameplayStatus.combo % 20) == 0) {
+                this.comboEffects[Math.floor(Math.random() * this.comboEffects.length)].play();
+            }
+        }
+        else {
+            this.judgeTipControllers[note.LaneId].setText(`${C.JUDGE_TO_TEXT[judgement]}`);
+        }
+        this.updateText();
+        noteObj.bodygroup = 1;
+        noteObj.up = false;
+        noteObj.onhit = undefined;
+        noteObj.clearFrames();
+        const noteIndex = this.noteObjs.indexOf(noteObj);
+        if (noteIndex != -1) {
+            this.noteObjs.splice(noteIndex, 1);
+        }
+        delaySec(C.WAIT_TIME).then(() => {
+            this._pool.returnNote(noteObj);
+        });
+        this.noteProgress++;
+        if (judgement > 2) {
+            return false;
+        }
+        return true;
+    }
+    updateText() {
+        Instance.Msg("update text");
+        let headshotRate = this.gameplayStatus.headshot / (this.gameplayStatus.headshot + this.gameplayStatus.bodyshot);
+        if (Number.isNaN(headshotRate)) {
+            headshotRate = 0;
+        }
+        const text = 'STATUS\n\n' +
+            `PERFECT: ${prependSpace(this.gameplayStatus.perfect)}\n` +
+            `GREAT: ${prependSpace(this.gameplayStatus.great)}\n` +
+            `GOOD: ${prependSpace(this.gameplayStatus.good)}\n` +
+            `BAD: ${prependSpace(this.gameplayStatus.bad)}\n` +
+            `POOR: ${prependSpace(this.gameplayStatus.poor)}\n` +
+            '\n' +
+            `HEADSHOT: ${prependSpace(`${this.gameplayStatus.headshot} (${Math.floor(headshotRate * 100)}%)`)}\n` +
+            `MAX COMBO: ${prependSpace(this.gameplayStatus.maxcombo)}\n\n` +
+            `L: ${this.gameplayStatus.late} | E: ${this.gameplayStatus.early} | ${(this.gameplayStatus.offset * 1000).toFixed(2)}ms`;
+        Instance.EntFireAtName({
+            name: 'maodie_judge_text',
+            input: 'SetMessage',
+            value: text,
+        });
+        const totalScore = this.music.chart.NoteDataList.length * 4;
+        const score = this.gameplayStatus.perfect * 3 +
+            this.gameplayStatus.great * 2 +
+            this.gameplayStatus.good * 1 +
+            this.gameplayStatus.headshot;
+        const percent = score / totalScore;
+        const rate = this.autoplay ? 'AUTOPLAY' : C.RATE_PRECENTS.find(v => v.percent < percent || Math.abs(v.percent - percent) < 0.001).rate;
+        Instance.EntFireAtName({
+            name: "game_score",
+            input: "SetMessage",
+            value: score.toString(),
+        });
+        Instance.EntFireAtName({
+            name: "game_score_percent",
+            input: "SetMessage",
+            value: (percent * 100).toFixed(2) + '%',
+        });
+        Instance.EntFireAtName({
+            name: "game_rate",
+            input: "SetMessage",
+            value: rate,
+        });
+        const status = [];
+        if (this.gameplayStatus.headshot == this.gameplayStatus.poor +
+            this.gameplayStatus.bad +
+            this.gameplayStatus.good +
+            this.gameplayStatus.great +
+            this.gameplayStatus.perfect) {
+            status.push("ALL HEADSHOT");
+            Instance.EntFireAtName({
+                name: "ah_indicator",
+                input: "Enable",
+            });
+        }
+        else {
+            Instance.EntFireAtName({
+                name: "ah_indicator",
+                input: "Disable",
+            });
+        }
+        if (this.gameplayStatus.bad == 0 && this.gameplayStatus.poor == 0) {
+            status.push('FULL COMBO');
+            Instance.EntFireAtName({
+                name: "fc_indicator",
+                input: "Enable",
+            });
+        }
+        else {
+            Instance.EntFireAtName({
+                name: "fc_indicator",
+                input: "Disable",
+            });
+        }
+        const optionText = C.OPTION_TO_TEXT[this.option];
+        const judgeOptText = C.JUDGE_OPTION_TO_TEXT[this.judgeOption];
+        if (optionText || judgeOptText) {
+            status.push('USE OPTION: ' + [optionText, judgeOptText].filter(v => v).join(', '));
+        }
+        Instance.EntFireAtName({
+            name: "game_indicator",
+            input: "SetMessage",
+            value: status.join('\n'),
+        });
+        const progress = (this.noteProgress + 1) / this.music.chart.NoteDataList.length;
+        Instance.EntFireAtName({
+            name: "animgraph_ctrl",
+            input: "SetProgressBar",
+            value: progress,
+        });
+    }
+    updateMusic() {
+        Instance.EntFireAtName({
+            name: "hachimi_monitor",
+            input: "SetMaterialGroup",
+            value: this.music.monitorMaterialGroup,
+        });
+        Instance.EntFireAtName({
+            name: "song_current_bv",
+            input: "SetMessage",
+            value: this.music.bv,
+        });
+    }
+    switchPlayerWeapon(name) {
+        return Promise.all(new Array(8).fill(0).map(async (_, i) => {
+            const pawn = Instance.GetPlayerController(i)?.GetPlayerPawn();
+            if (!pawn) {
+                return;
+            }
+            pawn.DestroyWeapons();
+            pawn.GiveNamedItem(name);
+            await nextTick();
+            const weapon = pawn.FindWeapon(name);
+            if (weapon) {
+                pawn.SwitchToWeapon(weapon);
+            }
+        }));
+    }
+}
+
+function onSongItemHit(index) {
+    return () => {
+        const inst = HachimiGame.instance;
+        if (!inst || !inst.postInited || !inst.musicStopped) {
+            return;
+        }
+        const mindex = inst.songList.calcIndexForItem(index);
+        inst.songList.setIndex(mindex);
+        inst.clearStatus();
+    };
+}
+function greenNumberAdd(num) {
+    const inst = HachimiGame.instance;
+    if (!inst || !inst.postInited) {
+        return;
+    }
+    inst.trackTime += num;
+    if (inst.trackTime < 0.01) {
+        inst.trackTime = 0.01;
+    }
+    else if (inst.trackTime > 5) {
+        inst.trackTime = 5;
+    }
+    const greenNumber = Math.floor((inst.trackTime * 1000 * 3) / 5);
+    Instance.EntFireAtName({
+        name: "maodie_green_num_text",
+        input: "SetMessage",
+        value: `${greenNumber}F`
+    });
+    Instance.EntFireAtName({
+        name: "maodie_speed_text",
+        input: "SetMessage",
+        value: `${(inst.speed / 10).toFixed(2)} inch/s`
+    });
+}
+function judgeOffsetAdd(num) {
+    const inst = HachimiGame.instance;
+    if (!inst || !inst.postInited) {
+        return;
+    }
+    inst.judgeOffset += num;
+    if (inst.judgeOffset < -1) {
+        inst.judgeOffset = -1;
+    }
+    else if (inst.judgeOffset > 1) {
+        inst.judgeOffset = 1;
+    }
+    const ms = Math.floor(inst.judgeOffset * 1000);
+    Instance.EntFireAtName({
+        name: "maodie_judge_offset_text",
+        input: "SetMessage",
+        value: `${ms}ms`
+    });
+}
+function initButtonActions(ctx) {
+    for (let i = 0; i < 12; i++) {
+        const item = Instance.FindEntityByName(`song_item_${i}`);
+        if (!item) {
+            continue;
+        }
+        Instance.ConnectOutput(item, "Use", onSongItemHit(i));
+        Instance.ConnectOutput(item, "OnTakeDamage", onSongItemHit(i));
+    }
+    Instance.OnScriptInput("ToggleWeaponSpread", () => {
+        ctx.spread = !ctx.spread;
+        Instance.ServerCommand("weapon_accuracy_nospread " + (ctx.spread ? '0' : '1'));
+        Instance.EntFireAtName({
+            name: "weapon_spread_display",
+            input: "SetMessage",
+            value: ctx.spread ? 'ON' : 'OFF'
+        });
+    });
+    Instance.OnScriptInput("ToggleHitmarker", () => {
+        const inst = HachimiGame.instance;
+        if (!inst) {
+            return;
+        }
+        inst.hitmarker = !inst.hitmarker;
+        Instance.EntFireAtName({
+            name: "hitmarker_display",
+            input: "SetMessage",
+            value: inst.hitmarker ? 'ON' : 'OFF'
+        });
+    });
+    Instance.OnScriptInput("ToggleAutoPlay", () => {
+        const inst = HachimiGame.instance;
+        if (!inst || !inst.musicStopped) {
+            return;
+        }
+        inst.autoplay = !inst.autoplay;
+        Instance.EntFireAtName({
+            name: "autoplay_display",
+            input: "SetMessage",
+            value: inst.autoplay ? 'ON' : 'OFF'
+        });
+    });
+    Instance.OnScriptInput("ToggleJudgeOption", () => {
+        const inst = HachimiGame.instance;
+        if (!inst || !inst.postInited || !inst.musicStopped) {
+            return;
+        }
+        if (inst.judgeOption + 1 > JudgeOpt.Easy) {
+            inst.judgeOption = JudgeOpt.Normal;
+        }
+        else {
+            inst.judgeOption = inst.option + 1;
+        }
+        Instance.EntFireAtName({
+            name: "judge_opt_display",
+            input: "SetMessage",
+            value: C.JUDGE_OPTION_TO_TEXT[inst.judgeOption] ?? 'NORMAL'
+        });
+    });
+    Instance.OnScriptInput("ToggleOption", () => {
+        const inst = HachimiGame.instance;
+        if (!inst || !inst.postInited || !inst.musicStopped) {
+            return;
+        }
+        if (inst.option + 1 > Opt.S_Random) {
+            inst.option = Opt.Off;
+        }
+        else {
+            inst.option = inst.option + 1;
+        }
+        Instance.EntFireAtName({
+            name: "option_display",
+            input: "SetMessage",
+            value: C.OPTION_TO_TEXT[inst.option] ?? 'OFF'
+        });
+    });
+    Instance.OnScriptInput("HachimiStart", () => {
+        const inst = HachimiGame.instance;
+        if (!inst) {
+            return;
+        }
+        inst.start();
+    });
+    Instance.OnScriptInput("StopMusic", () => {
+        const inst = HachimiGame.instance;
+        if (!inst || !inst.postInited || inst.musicStopped) {
+            return;
+        }
+        inst.stop();
+    });
+    Instance.OnScriptInput("HachimiGreenNumSub", () => {
+        greenNumberAdd(-0.05);
+    });
+    Instance.OnScriptInput("HachimiGreenNumPlus", () => {
+        greenNumberAdd(0.05);
+    });
+    Instance.OnScriptInput("HachimiJudgeOffsetSub", () => {
+        judgeOffsetAdd(-2e-3);
+    });
+    Instance.OnScriptInput("HachimiJudgeOffsetPlus", () => {
+        judgeOffsetAdd(0.002);
+    });
+}
+
+async function checkTime() {
+    await nextTick();
+    let lastTimeReal = 0;
+    let lastTimeGame = 0;
+    while (true) {
+        const now = new Date();
+        const timeReal = now.valueOf() / 1000;
+        const timeGame = Instance.GetGameTime();
+        const deltaReal = timeReal - lastTimeReal;
+        const deltaGame = timeGame - lastTimeGame;
+        const timeScale = deltaGame / deltaReal;
+        // toLocalTimeString crashes the game, fuck Valve
+        const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+        Instance.EntFireAtName({
+            name: "game_timer",
+            input: "SetMessage",
+            value: `${timeString}\n${timeScale < 0.98 ? ' (CHEATING)' : ''}`
+        });
+        lastTimeReal = timeReal;
+        lastTimeGame = timeGame;
+        await delay(1000);
+    }
+}
+
+let scrInsConnection = undefined;
+let reloaded = false;
+let ctx = {
+    spread: false,
+};
+let offset = 0;
+let index = 0;
+let currentMusic = null;
+const instructions = {
+    Begin: () => {
+        currentMusic = {
+            name: '',
+            bv: '',
+            charter: '',
+            sndEvent: '',
+            monitorMaterialGroup: '0',
+            sort: 99999999,
+            chart: {
+                BarLineList: [],
+                NoteDataList: [],
+                SoflanDataList: [{
+                        Time: -60,
+                        Speed: 1,
+                    }],
+                WeaponDataList: []
+            }
+        };
+        offset = 0;
+        Instance.Msg("Clear currentMusic");
+    },
+    End: () => {
+        Instance.Msg(`Add Music: ${currentMusic.name} ${currentMusic.charter}, Note count: ${currentMusic.chart.NoteDataList.length}`);
+        let index = charts.findIndex(v => v.name == currentMusic.name && v.charter == currentMusic.charter);
+        if (index > 0) {
+            charts[index] = currentMusic;
+        }
+        else {
+            charts.push(currentMusic);
+            index = charts.length;
+        }
+        charts.sort((a, b) => a.sort - b.sort);
+    },
+    Next: async () => {
+        await nextTick();
+        Instance.ServerCommand(`exec _m_${++index}`);
+    },
+    SetName: (name) => {
+        currentMusic.name = name;
+    },
+    SetBV: (bv) => {
+        currentMusic.bv = bv;
+    },
+    SetCharter: (charter) => {
+        currentMusic.charter = charter;
+    },
+    SetSoundEvent: (se) => {
+        currentMusic.sndEvent = se;
+    },
+    SetCover: (cover) => {
+        currentMusic.monitorMaterialGroup = cover;
+    },
+    SetSort: (sort) => {
+        currentMusic.sort = parseInt(sort);
+    },
+    SetOffset: (offsetStr) => {
+        offset = parseInt(offsetStr);
+    },
+    SetBarLines: (barLines) => {
+        currentMusic.chart.BarLineList = JSON.parse(barLines).map(v => v + offset);
+    },
+    AddNote: (note) => {
+        const [LaneId, Time] = JSON.parse(note);
+        currentMusic.chart.NoteDataList.push({ LaneId: LaneId, Time: Time + offset });
+    },
+    AddSoflan: (soflan) => {
+        const [Time, Speed] = JSON.parse(soflan);
+        currentMusic.chart.SoflanDataList.push({ Time: Time, Speed: Speed });
+    },
+    WeaponSwitch: (sw) => {
+        const [Time, Weapon] = JSON.parse(sw.replaceAll('\'', '"'));
+        currentMusic.chart.WeaponDataList.push({ Time, Weapon });
+    },
+};
+let superJumpEnabled = false;
+function enableSuperJump() {
+    if (superJumpEnabled) {
+        return;
+    }
+    superJumpEnabled = true;
+    Instance.OnPlayerJump(async ({ player }) => {
+        await nextTick();
+        const velocity = player.GetAbsVelocity();
+        player.Teleport({
+            velocity: Vec.from(velocity).mul(2),
+        });
+    });
+    Instance.ServerCommand("say \"MORE MORE JUMP\"");
+}
+function main(memory) {
+    Instance.Msg("Main");
+    if (memory) {
+        ctx = memory;
+    }
+    Instance.ServerCommand("mp_maxmoney 90000");
+    Instance.ServerCommand("mp_buytime 65535");
+    Instance.ServerCommand("weapon_accuracy_nospread 1");
+    const pulseent = Instance.FindEntityByName("pulseent");
+    if (!pulseent) {
+        return;
+    }
+    scrInsConnection = Instance.ConnectOutput(pulseent, "Instruction", ({ value }) => {
+        if (reloaded) {
+            return;
+        }
+        const [action, params] = value.split('|');
+        if (action in instructions) {
+            instructions[action](params);
+            return;
+        }
+        Instance.Msg(`unknown action ${action}`);
+    });
+    Instance.SetThink(() => {
+        tickCallback();
+        Instance.SetNextThink(Instance.GetGameTime() + 1.0 / 64);
+    });
+    Instance.SetNextThink(Instance.GetGameTime() + 1.0 / 64);
+    Instance.ServerCommand(`exec _m_0`);
+    Instance.OnRoundStart(() => {
+        initButtonActions(ctx);
+        const inst = HachimiGame.init();
+        scheduleTick(inst.onTick.bind(inst));
+    });
+    Instance.OnPlayerReset(({ player }) => {
+        player.SetArmor(100);
+        Instance.EntFireAtName({
+            name: "money",
+            input: "AddMoneyPlayer",
+            activator: player,
+        });
+        const controller = player.GetPlayerController();
+        if (controller) {
+            Instance.ClientCommand(controller.GetPlayerSlot(), "gpu_mem_level 2");
+        }
+    });
+    Instance.OnPlayerChat(({ player, text }) => {
+        if (text === "jump") {
+            enableSuperJump();
+        }
+    });
+    checkTime();
+}
+function cleanUp() {
+    Instance.Msg("Clean up");
+    reloaded = true;
+    if (scrInsConnection !== undefined) {
+        // not working
+        Instance.DisconnectOutput(scrInsConnection);
+    }
+    stopAllSound();
+    removeAllEntities();
+    scrInsConnection = undefined;
+    return ctx;
+}
+Instance.OnActivate(main);
+Instance.OnScriptReload({
+    before: cleanUp,
+    after: () => {
+        Instance.ServerCommand("endround");
+        main();
+    },
+});

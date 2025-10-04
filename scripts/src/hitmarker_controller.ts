@@ -1,9 +1,9 @@
-import { Instance } from "cspointscript";
+import { Instance } from "cs_script/point_script";
 
 export class HitmarkerController {
     constructor(
         private readonly targetName: string
-    ) {}
+    ) { }
 
     started = false;
     requestedStart = false;
@@ -14,14 +14,20 @@ export class HitmarkerController {
 
     onTick() {
         if (this.started) {
-            Instance.EntFireAtName(this.targetName, "Stop");
+            Instance.EntFireAtName({
+                name: this.targetName,
+                input: "Stop"
+            });
             this.started = false;
             return;
         }
 
         if (this.requestedStart) {
             this.requestedStart = false;
-            Instance.EntFireAtName(this.targetName, "Start");
+            Instance.EntFireAtName({
+                name: this.targetName,
+                input: "Start",
+            });
             this.started = true;
         }
     }

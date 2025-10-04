@@ -1,16 +1,14 @@
-/// <reference types="s2ts/types/cspointscript" />
-import { Instance } from "cspointscript";
-import { HachimiGame } from "./hachimi";
-import { NoteData } from "./musics";
-import { createEntity, game, runServerCommand, uniqueId } from "s2ts/counter-strike";
+import { BaseModelEntity, Entity, Instance } from "cs_script/point_script";
 import { C } from "./constants";
+import { createEntity } from "./utils/entity";
+import { Vec } from "./utils/type_helper";
 
 export interface Frame {
     time: number;
     progress?: number;
     bodygroup?: number;
     isUp?: boolean;
-    callback?: () => void;
+    callback?: (this: Note) => void;
 }
 
 const LANE_START = 1929;
@@ -19,70 +17,71 @@ const LEFT_LANE = 896;
 const SPACE = 64;
 export const JUDGE_POINT = 0.93;
 
-let cmdExecuted = 0;
-let cmdQueue: string[] = [];
-const MAX_CMD_PER_FRAME = 100;
-
-function executeCommandQueued(cmd: string) {
-    if (cmdExecuted++ > MAX_CMD_PER_FRAME) {
-        cmdQueue.push(cmd);
-        return;
-    }
-
-    runServerCommand(cmd);
-}
-
 let lastTargetName: string = '';
 function setAnimgraphParam(targetname: string, paramName: string, param: number | boolean | string) {
     if (targetname != lastTargetName) {
-        Instance.EntFireAtName("animgraph_ctrl", "SetTarget", targetname);
+        Instance.EntFireAtName({
+            name: "pulseent",
+            input: "SetTarget",
+            value: targetname
+        });
         lastTargetName = targetname;
     }
 
-    Instance.EntFireAtName("animgraph_ctrl", `Set${paramName}`, param);
+    Instance.EntFireAtName({
+        name: "pulseent",
+        input: `Set${paramName}`,
+        value: param,
+    });
 }
 
-const callbacks: Map<string, () => void> = new Map();
-
-Instance.PublicMethod("OnNoteHit", (id: string) => {
-    const cb = callbacks.get(id);
-    if (cb) cb();
-});
-
 export class Note {
-    _targetname: string;
-    _targetname_head: string;
-    _targetname_blocker: string;
+    _body: BaseModelEntity = null!;
+    _head: BaseModelEntity = null!;
+    _blocker: BaseModelEntity = null!;
+    targetPos: Vec = Vec.zero();
 
-    teleporter: string = '';
+    async init(id: number) {
+        const targetname = "mt_" + id
+        const targetname_head = "mt_h_" + id;
+        const targetname_blocker = "mt_bl_" + id;
 
-    constructor(id: number) {
-        this._targetname = "mt_" + id
-        this._targetname_head = "mt_h_" + id;
-        this._targetname_blocker = "mt_bl_" + id;
+        [this._body, this._head, this._blocker] = await Promise.all([
+            createEntity<BaseModelEntity>(targetname, "prop_dynamic", {
+                origin: new Vec(1000, 9999, -100),
+                model: 'models/maodie_target.vmdl',
+                solid: 6,
+            }),
+            createEntity<BaseModelEntity>(targetname_head, "prop_dynamic", {
+                origin: new Vec(1000, 9999, -100),
+                model: 'models/maodie_target_head.vmdl',
+                solid: 6,
+            }),
+            createEntity<BaseModelEntity>(targetname_blocker, "prop_dynamic", {
+                origin: new Vec(1000, 9999, -100),
+                model: 'models/maodie_target_bullet_blocker.vmdl',
+                solid: 6,
+            }),
+        ]);
 
-        executeCommandQueued(`ent_create prop_dynamic { "targetname" "${this._targetname}" "origin" "1000 9999 -100" "model" "models/maodie_target.vmdl" "solid" "6" }`);
-        executeCommandQueued(`ent_create prop_dynamic { "targetname" "${this._targetname_head}" "origin" "1000 9999 -100" "model" "models/maodie_target_head.vmdl" "solid" "6" }`);
-        executeCommandQueued(`ent_create prop_dynamic { "targetname" "${this._targetname_blocker}" "origin" "1000 9999 -100" "model" "models/maodie_target_bullet_blocker.vmdl" "solid" "6" }`);
 
-        game.runAfterDelaySeconds(() => {
-            Instance.EntFireAtName(this._targetname_head, "SetParent", this._targetname);
-            Instance.EntFireAtName(this._targetname_head, "SetParentAttachment", "target", 0.01);
-            
-            Instance.EntFireAtName(this._targetname_blocker, "SetParent", this._targetname);
-            Instance.EntFireAtName(this._targetname_blocker, "SetParentAttachment", "target", 0.01);
+        this._head.SetParent(this._body);
+        this._blocker.SetParent(this._body);
 
-            Instance.EntFireAtName(this._targetname_head, "AddOutput", `OnTakeDamage>s2ts-script>OnNoteHit>${id}_0>>`);
-            Instance.EntFireAtName(this._targetname, "AddOutput", `OnTakeDamage>s2ts-script>OnNoteHit>${id}_1>>`);
-        }, 0.1);
-
-        callbacks.set(`${id}_0`, () => {
-            if (this._cb) this._cb(0);
+        Instance.EntFireAtTarget({
+            target: this._head,
+            input: 'SetParentAttachment',
+            value: 'target',
         });
 
-        callbacks.set(`${id}_1`, () => {
-            if (this._cb) this._cb(1);
+        Instance.EntFireAtTarget({
+            target: this._blocker,
+            input: 'SetParentAttachment',
+            value: 'target',
         });
+
+        Instance.ConnectOutput(this._head, "OnTakeDamage", () => this._cb ? this._cb(0) : undefined);
+        Instance.ConnectOutput(this._body, "OnTakeDamage", () => this._cb ? this._cb(1) : undefined);
     }
 
     private _up = false;
@@ -95,7 +94,7 @@ export class Note {
             return;
         }
 
-        setAnimgraphParam(this._targetname, "IsUp", value);
+        setAnimgraphParam(this._body.GetEntityName(), "IsUp", value);
         this._up = value;
     }
 
@@ -109,16 +108,20 @@ export class Note {
             return;
         }
 
-        setAnimgraphParam(this._targetname, "Position", value);
+        setAnimgraphParam(this._body.GetEntityName(), "Position", value);
         this._positon = value;
     }
 
     set bodygroup(value: number) {
-        Instance.EntFireAtName(this._targetname_head, 'SetBodyGroup', 'maodie,' + value);
+        Instance.EntFireAtTarget({
+            target: this._head,
+            input: 'SetBodyGroup',
+            value: 'maodie,' + value,
+        })
     }
 
-    private _cb: ((number) => void) | undefined = undefined;
-    set onhit(cb: ((number) => void) | undefined) {
+    private _cb: ((where: number) => void) | undefined = undefined;
+    set onhit(cb: ((where: number) => void) | undefined) {
         this._cb = cb;
     }
 
@@ -136,17 +139,47 @@ export class Note {
     }
 
     hide() {
-        Instance.EntFireAtName(this._targetname, "SetScale", "0");
-        Instance.EntFireAtName(this._targetname_head, "SetScale", "0");
-        Instance.EntFireAtName(this._targetname_blocker, "SetScale", "0");
+        Instance.EntFireAtTarget({
+            target: this._body,
+            input: "SetScale",
+            value: "0",
+        });
+        Instance.EntFireAtTarget({
+            target: this._head,
+            input: "SetScale",
+            value: "0",
+        });
+        Instance.EntFireAtTarget({
+            target: this._blocker,
+            input: "SetScale",
+            value: "0",
+        });
+        
+        this._body.Teleport({
+            position: Vec.zero(),
+        });
     }
 
     show() {
-        Instance.EntFireAtName(this._targetname, "SetScale", "1");
-        Instance.EntFireAtName(this._targetname_head, "SetScale", "1");
-        Instance.EntFireAtName(this._targetname_blocker, "SetScale", "1");
+        Instance.EntFireAtTarget({
+            target: this._body,
+            input: "SetScale",
+            value: "1",
+        });
+        Instance.EntFireAtTarget({
+            target: this._head,
+            input: "SetScale",
+            value: "1",
+        });
+        Instance.EntFireAtTarget({
+            target: this._blocker,
+            input: "SetScale",
+            value: "1",
+        });
 
-        Instance.EntFireAtName(this.teleporter, "TeleportEntity", this._targetname);
+        this._body.Teleport({
+            position: this.targetPos,
+        });
     }
 
     addFrame(keyframe: Frame) {
@@ -271,50 +304,22 @@ export class Note {
 export class NotePool {
     _lastNoteIndex = 0;
     _pool: Note[] = [];
-    _teleports = new Map<number, string>();
 
-    /**
-     *
-     */
-    constructor() {
-
-    }
-
-    rent(lane: number): Note {
-        const targetName = "maodie_spawnpoint_" + lane;
-
-        if (!this._teleports.has(lane)) {
-            this._teleports.set(lane, targetName);
-
-            createEntity({
-                // @ts-expect-error
-                class: "point_teleport",
-                keyValues: {
-                    targetName,
-                    origin: { x: LEFT_LANE + lane * SPACE, y: LANE_START, z: LANE_HEIGHT },
-                }
-            });
+    async rent(lane: number): Promise<Note> {
+        let result = this._pool.pop();
+        if (!result) {
+            result = new Note();
+            await result.init(this._lastNoteIndex++);
         }
 
-        const existing = this._pool.pop() ?? new Note(this._lastNoteIndex++);
-        existing.teleporter = targetName;
-
-        return existing;
+        result.reset();
+        result.targetPos = new Vec(LEFT_LANE + lane * SPACE, LANE_START, LANE_HEIGHT);
+        return result;
     }
 
     returnNote(note: Note) {
         note.hide();
         note.reset();
         this._pool.push(note);
-    }
-
-    onTick() {
-        cmdExecuted = 0;
-        const queuedCmd = cmdQueue.slice();
-        cmdQueue = [];
-
-        for (const cmd of queuedCmd) {
-            executeCommandQueued(cmd);
-        }
     }
 }

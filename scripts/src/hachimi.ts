@@ -1,13 +1,12 @@
-/// <reference types="s2ts/types/cspointscript" />
-import { Instance } from "cspointscript"
-import { runServerCommand, game, addOutputByName, createEntity, uniqueId, Vector } from "s2ts/counter-strike"
-import { Chart, charts, NoteData } from './musics';
+import { Instance } from "cs_script/point_script";
+import { Chart, charts, NoteData } from '../src/musics';
 import { C, JudgeOpt, Opt } from "./constants";
-import { SoundEffect, createSoundEvent } from "./sound";
+import { SoundEffect, createSoundEvent } from "./utils/sound";
 import { JudgeTipController } from "./judge_tip_controller";
 import { HitmarkerController } from "./hitmarker_controller";
-import { Frame, JUDGE_POINT, Note, NotePool } from "./note";
+import { Frame, JUDGE_POINT, Note, NotePool } from "../src/note";
 import { SongList } from "./song_list";
+import { delay, delaySec, nextTick } from "./utils/scheduler";
 
 function prependSpace(value: { toString: () => string }, count: number = 12) {
     return value.toString().padStart(count, ' ');
@@ -258,7 +257,7 @@ export class HachimiGame {
                 note.LaneId = laneMap[note.LaneId];
             }
 
-            runServerCommand("say \"" + C.OPTION_TO_TEXT[this.option] + ": " + [0, 1, 2, 3, 4, 5, 6]
+            Instance.ServerCommand("say \"" + C.OPTION_TO_TEXT[this.option] + ": " + [0, 1, 2, 3, 4, 5, 6]
                 .map(v => laneMap[v] + 1)
                 .join('') + "\""
             );
@@ -268,7 +267,7 @@ export class HachimiGame {
             }
         }
 
-        runServerCommand("say Applyed " + C.OPTION_TO_TEXT[this.option]);
+        Instance.ServerCommand("say Applyed " + C.OPTION_TO_TEXT[this.option]);
     }
 
     get chart() {
@@ -338,56 +337,67 @@ export class HachimiGame {
 
     judgeTipControllers: JudgeTipController[] = [];
 
-    combobreakEffect: SoundEffect;
-    comboEffects: SoundEffect[];
+    combobreakEffect: SoundEffect = null!;
+    comboEffects: SoundEffect[] = [];
 
-    haEffect: SoundEffect;
+    haEffect: SoundEffect = null!;
 
-    hitmarkerEffect: SoundEffect;
-    headshotHitmarkerEffect: SoundEffect;
+    hitmarkerEffect: SoundEffect = null!;
+    headshotHitmarkerEffect: SoundEffect = null!;
     hitmarkerController: HitmarkerController = new HitmarkerController("hitmarker_particle");
     headshotHitmarkerController: HitmarkerController = new HitmarkerController("hitmarker_particle_headshot");
+    _soundPlayer: SoundEffect | undefined;
 
     constructor() {
-    }
-
-    postInit() {
         this.postInited = true;
 
-        game.runNextTick(() => {
-            Instance.EntFireAtName('maodie_start_text', 'SetMessage', "PRESS TO START");
-
-            for (let i = 0; i < 7; i++) {
-                this.judgeTipControllers.push(new JudgeTipController('maodie_judge_tip_' + i));
-            }
-
-            this.haEffect = createSoundEvent('effect.maodie_ha');
-            this.hitmarkerEffect = createSoundEvent('effect.hitmarker');
-            this.headshotHitmarkerEffect = createSoundEvent('effect.hitmarker_headshot');
-            this.combobreakEffect = createSoundEvent('effect.siren_laugh');
-            this.comboEffects = ['effect.wow', 'effect.manbo', 'effect.oye'].map(v => createSoundEvent(v));
-
-            runServerCommand("exec music_list.cfg");
-            this.updateText();
-            this.updateMusic();
-
-            this.canStart = true;
-            runServerCommand("say Ready");
+        Instance.EntFireAtName({
+            name: 'maodie_start_text',
+            input: 'SetMessage',
+            value: "PRESS TO START"
         });
+
+        for (let i = 0; i < 7; i++) {
+            this.judgeTipControllers.push(new JudgeTipController('maodie_judge_tip_' + i));
+        }
+
+        Promise.all([
+            createSoundEvent('effect.maodie_ha'),
+            createSoundEvent('effect.hitmarker'),
+            createSoundEvent('effect.hitmarker_headshot'),
+            createSoundEvent('effect.siren_laugh'),
+            Promise.all(['effect.wow', 'effect.manbo', 'effect.oye'].map(v => createSoundEvent(v)))
+        ]).then(values => {
+            [
+                this.haEffect,
+                this.hitmarkerEffect,
+                this.headshotHitmarkerEffect,
+                this.combobreakEffect,
+                this.comboEffects
+            ] = values;
+        })
+
+        Instance.ServerCommand("exec music_list.cfg");
+        this.updateText();
+        this.updateMusic();
+        this.clearStatus();
+
+        this.canStart = true;
+        Instance.ServerCommand("say Ready");
     }
 
     get time() {
         return Instance.GetGameTime() - this.musicStartTime;
     }
 
-    spawnMaodie(spawnPoint: number, noteIndex: number, frames: Frame[]) {
+    async spawnMaodie(spawnPoint: number, noteIndex: number, frames: Frame[]) {
         if (spawnPoint < 0 || spawnPoint > 6) {
             Instance.Msg("invalid spawn point " + spawnPoint);
 
             return;
         }
 
-        const note = this._pool.rent(spawnPoint);
+        const note = await this._pool.rent(spawnPoint);
 
         frames.forEach(f => note.addFrame(f));
         note.setupFrames();
@@ -402,8 +412,6 @@ export class HachimiGame {
     }
 
     onTick() {
-        this._pool.onTick();
-
         this.processKilledTargets();
 
         this.noteObjs.forEach(v => v.onTick(this.time));
@@ -421,9 +429,11 @@ export class HachimiGame {
 
         if (musicTime > 0 && !this.musicStarted) {
             this.musicStarted = true;
-
-            Instance.EntFireAtName('maodie_sound_player', 'StartSound');
-            Instance.EntFireAtName("start_hint", "HideHudHint");
+            this._soundPlayer?.play();
+            Instance.EntFireAtName({
+                name: "start_hint",
+                input: "HideHudHint",
+            });
         }
 
         for (let i = this.lastNoteIndex; i < this.notes.length; i++) {
@@ -460,14 +470,19 @@ export class HachimiGame {
             return;
         }
 
-        Instance.EntFireAtName("stop_button", "Alpha", 0);
-        Instance.EntFireAtName('maodie_start_text', 'SetMessage', "PRESS TO START");
+        Instance.EntFireAtName({
+            name: "stop_button",
+            input: "Alpha",
+            value: 0,
+        });
+        Instance.EntFireAtName({
+            name: 'maodie_start_text',
+            input: 'SetMessage',
+            value: "PRESS TO START",
+        });
 
         if (!soft) {
-            runServerCommand("ent_fire logic_relay FireUser2");
-            runServerCommand("ent_fire func_tracktrain Stop");
-            Instance.EntFireBroadcast('maodie_sound_player', 'StopSound');
-            Instance.EntFireBroadcast('maodie_sound_player', 'Kill');
+            this._soundPlayer?.kill();
 
             this.noteObjs.forEach(v => this._pool.returnNote(v));
             this.noteObjs = [];
@@ -499,9 +514,9 @@ export class HachimiGame {
         this.updateText();
     }
 
-    start() {
+    async start() {
         if (!this.postInited) {
-            runServerCommand("say Not ready yet.");
+            Instance.ServerCommand("say Not ready yet.");
             return;
         }
 
@@ -513,18 +528,21 @@ export class HachimiGame {
             return;
         }
 
-        runServerCommand("ent_fire start_hint showhudhint");
+        Instance.EntFireAtName({
+            name: "start_hint",
+            input: "ShowHudHint",
+        })
 
         this.songList._previewStarted = true;
         this.songList.stopPreview();
         this.canStart = false;
 
         this.applyChartOptions();
-
-        runServerCommand("ent_fire logic_relay FireUser2");
-        Instance.EntFireBroadcast('maodie_sound_player', 'StopSound');
-        Instance.EntFireBroadcast('maodie_sound_player', 'Kill');
-        Instance.EntFireAtName('maodie_start_text', 'SetMessage', "GET READY");
+        Instance.EntFireAtName({
+            name: 'maodie_start_text',
+            input: 'SetMessage',
+            value: "GET READY"
+        });
 
         const barTime = this.chart.BarLineList[1] - this.chart.BarLineList[0];
         const tickTime = barTime / 4;
@@ -547,38 +565,41 @@ export class HachimiGame {
             lastLaneNoteTimes[note.LaneId] = note.Time;
         }
 
-        Instance.EntFireAtName("fc_indicator", "Enable");
-        Instance.EntFireAtName("ah_indicator", "Enable");
+        Instance.EntFireAtName({
+            name: "fc_indicator",
+            input: "Enable",
+        });
+        Instance.EntFireAtName({
+            name: "ah_indicator",
+            input: "Enable",
+        });
 
-        game.runNextTick(() => {
-            createEntity({
-                class: 'point_soundevent',
-                keyValues: {
-                    targetName: 'maodie_sound_player',
-                    soundName: this.musicSndEvent,
-                },
+        await nextTick();
+
+        this._soundPlayer = await createSoundEvent(this.musicSndEvent);
+        this.musicStartTime = Instance.GetGameTime() + blankTime;
+        this.musicStopped = false;
+        this.musicStarted = false;
+        this.hardStopped = false;
+        this.lastNoteIndex = 0;
+        this.lastWeaponIndex = 0;
+
+        this.updateText();
+
+        for (let i = 1; i <= 4; i++) {
+            delaySec(blankTime - (tickTime * i)).then(() => {
+                if (this.hardStopped) {
+                    return;
+                }
+
+                this.haEffect.play();
             });
+        }
 
-            this.musicStartTime = Instance.GetGameTime() + blankTime;
-            this.musicStopped = false;
-            this.musicStarted = false;
-            this.hardStopped = false;
-            this.lastNoteIndex = 0;
-            this.lastWeaponIndex = 0;
-
-            this.updateText();
-
-            for (let i = 1; i <= 4; i++) {
-                game.runAfterDelaySeconds(() => {
-                    if (this.hardStopped) {
-                        return;
-                    }
-
-                    this.haEffect.play();
-                }, blankTime - (tickTime * i));
-            }
-
-            Instance.EntFireAtName("stop_button", "Alpha", 255);
+        Instance.EntFireAtName({
+            name: "stop_button",
+            input: "Alpha",
+            value: 255,
         });
     }
 
@@ -598,9 +619,7 @@ export class HachimiGame {
             });
 
         for (const obj of sorted) {
-            if (this.processKilledTarget(obj)) {
-                break;
-            }
+            this.processKilledTarget(obj);
         }
 
         this.killedObjects = [];
@@ -709,9 +728,9 @@ export class HachimiGame {
             this.noteObjs.splice(noteIndex, 1);
         }
 
-        game.runAfterDelaySeconds(() => {
+        delaySec(C.WAIT_TIME).then(() => {
             this._pool.returnNote(noteObj);
-        }, C.WAIT_TIME);
+        });
 
         this.noteProgress++;
 
@@ -723,6 +742,8 @@ export class HachimiGame {
     }
 
     updateText() {
+        Instance.Msg("update text");
+
         let headshotRate = this.gameplayStatus.headshot / (this.gameplayStatus.headshot + this.gameplayStatus.bodyshot);
         if (Number.isNaN(headshotRate)) {
             headshotRate = 0;
@@ -739,7 +760,11 @@ export class HachimiGame {
             `MAX COMBO: ${prependSpace(this.gameplayStatus.maxcombo)}\n\n` +
             `L: ${this.gameplayStatus.late} | E: ${this.gameplayStatus.early} | ${(this.gameplayStatus.offset * 1000).toFixed(2)}ms`;
 
-        Instance.EntFireAtName('maodie_judge_text', 'SetMessage', text);
+        Instance.EntFireAtName({
+            name: 'maodie_judge_text',
+            input: 'SetMessage',
+            value: text,
+        });
 
         const totalScore = this.music.chart.NoteDataList.length * 4;
         const score = this.gameplayStatus.perfect * 3 +
@@ -749,9 +774,21 @@ export class HachimiGame {
         const percent = score / totalScore;
         const rate = this.autoplay ? 'AUTOPLAY' : C.RATE_PRECENTS.find(v => v.percent < percent || Math.abs(v.percent - percent) < 0.001)!.rate;
 
-        Instance.EntFireAtName("game_score", "SetMessage", score.toString());
-        Instance.EntFireAtName("game_score_percent", "SetMessage", (percent * 100).toFixed(2) + '%');
-        Instance.EntFireAtName("game_rate", "SetMessage", rate);
+        Instance.EntFireAtName({
+            name: "game_score",
+            input: "SetMessage",
+            value: score.toString(),
+        });
+        Instance.EntFireAtName({
+            name: "game_score_percent",
+            input: "SetMessage",
+            value: (percent * 100).toFixed(2) + '%',
+        });
+        Instance.EntFireAtName({
+            name: "game_rate",
+            input: "SetMessage",
+            value: rate,
+        });
 
         const status: string[] = [];
 
@@ -761,16 +798,28 @@ export class HachimiGame {
             this.gameplayStatus.great +
             this.gameplayStatus.perfect) {
             status.push("ALL HEADSHOT");
-            Instance.EntFireAtName("ah_indicator", "Enable");
+            Instance.EntFireAtName({
+                name: "ah_indicator",
+                input: "Enable",
+            });
         } else {
-            Instance.EntFireAtName("ah_indicator", "Disable");
+            Instance.EntFireAtName({
+                name: "ah_indicator",
+                input: "Disable",
+            });
         }
 
         if (this.gameplayStatus.bad == 0 && this.gameplayStatus.poor == 0) {
             status.push('FULL COMBO');
-            Instance.EntFireAtName("fc_indicator", "Enable");
+            Instance.EntFireAtName({
+                name: "fc_indicator",
+                input: "Enable",
+            });
         } else {
-            Instance.EntFireAtName("fc_indicator", "Disable");
+            Instance.EntFireAtName({
+                name: "fc_indicator",
+                input: "Disable",
+            });
         }
 
         const optionText = C.OPTION_TO_TEXT[this.option];
@@ -780,36 +829,50 @@ export class HachimiGame {
             status.push('USE OPTION: ' + [optionText, judgeOptText].filter(v => v).join(', '));
         }
 
-        Instance.EntFireAtName("game_indicator", "SetMessage", status.join('\n'));
+        Instance.EntFireAtName({
+            name: "game_indicator",
+            input: "SetMessage",
+            value: status.join('\n'),
+        });
 
         const progress = (this.noteProgress + 1) / this.music.chart.NoteDataList.length;
-        Instance.EntFireAtName("animgraph_ctrl", "SetProgressBar", progress);
+        Instance.EntFireAtName({
+            name: "animgraph_ctrl",
+            input: "SetProgressBar",
+            value: progress,
+        });
     }
 
     updateMusic() {
-        Instance.EntFireAtName("hachimi_monitor", "SetMaterialGroup", this.music.monitorMaterialGroup);
-        // Instance.EntFireAtName("maodie_title_text", "SetMessage", this.music.name);
-        // Instance.EntFireAtName("maodie_charter_text", "SetMessage", this.music.charter);
-        Instance.EntFireAtName("song_current_bv", "SetMessage", this.music.bv);
+        Instance.EntFireAtName({
+            name: "hachimi_monitor",
+            input: "SetMaterialGroup",
+            value: this.music.monitorMaterialGroup,
+        });
+        Instance.EntFireAtName({
+            name: "song_current_bv",
+            input: "SetMessage",
+            value: this.music.bv,
+        });
     }
 
     switchPlayerWeapon(name: string) {
-        for (let i = 0; i < 8; i++) {
-            const pawn = Instance.GetPlayerPawn(i);
+        return Promise.all(new Array(8).fill(0).map(async (_, i) => {
+            const pawn = Instance.GetPlayerController(i)?.GetPlayerPawn();
             if (!pawn) {
-                break;
+                return;
             }
 
             pawn.DestroyWeapons();
             pawn.GiveNamedItem(name);
 
-            game.runNextTick(() => {
-                const weapon = pawn.FindWeapon(name);
+            await nextTick();
 
-                if (weapon) {
-                    pawn.SwitchToWeapon(weapon);
-                }
-            });
-        }
+            const weapon = pawn.FindWeapon(name);
+
+            if (weapon) {
+                pawn.SwitchToWeapon(weapon);
+            }
+        }));
     }
 }
