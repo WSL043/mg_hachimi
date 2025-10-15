@@ -437,6 +437,125 @@
 							},
 						]
 					},
+					{
+						_class = "MaterialGroup"
+						name = "advance_hachimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/advance_hachimi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "cherry_chimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/cherry_chimi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "despamanbo"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/despamanbo.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "green_is_the_mountain_hachimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/green_is_the_mountain_hachimi.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "IZANA_hachimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/izana_hachimi.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "mambo_mianWoCuoTuoKu"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/mambo_mianwocuotuoku.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "mambo_thud"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/mambo_thud.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "overkill_hachimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/overkill_hachimi.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "manbol"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/manbol.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
 				]
 			},
 		]

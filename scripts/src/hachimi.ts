@@ -533,9 +533,9 @@ export class HachimiGame {
             input: "ShowHudHint",
         })
 
+        this.canStart = false;
         this.songList._previewStarted = true;
         this.songList.stopPreview();
-        this.canStart = false;
 
         this.applyChartOptions();
         Instance.EntFireAtName({
@@ -835,7 +835,7 @@ export class HachimiGame {
 
         const progress = (this.noteProgress + 1) / this.music.chart.NoteDataList.length;
         Instance.EntFireAtName({
-            name: "animgraph_ctrl",
+            name: "pulseent",
             input: "SetProgressBar",
             value: progress,
         });

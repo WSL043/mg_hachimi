@@ -280,6 +280,78 @@
 		vsnd_files = "sounds/songs/hachimi_potion.vsnd"
 	}
 
+	"music.advance_hachimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/advance_hachimi.vsnd"
+	}
+	
+	"music.cherry_chimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/cherry_chimi.vsnd"
+	}
+
+	"music.despamanbo" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/despamanbo.vsnd"
+	}
+
+	"music.green_is_the_mountain_hachimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/green_is_the_mountain_hachimi.vsnd"
+	}
+
+	"music.IZANA_hachimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/IZANA_hachimi.vsnd"
+	}
+
+	"music.mambo_mianWoCuoTuoKu" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/mambo_mianWoCuoTuoKu.vsnd"
+	}
+
+	"music.mambo_thud" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/mambo_thud.vsnd"
+	}
+
+	"music.manbol" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/manbol.vsnd"
+	}
+	
+	"music.overkill_hachimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/overkill_hachimi.vsnd"
+	}
+
 	"effect.maodie_ha" =
 	{
 		type = "csgo_music"

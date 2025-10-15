@@ -126,7 +126,10 @@ export class SongList {
 
     async onTick() {
         if (this._displayIndex == this.index) {
-            if (Instance.GetGameTime() - this._lastChangeTime > 1.0 && !this._previewStarted) {
+            if (this.game.canStart &&
+                Instance.GetGameTime() - this._lastChangeTime > 1.0 &&
+                !this._previewStarted
+            ) {
                 this._previewStarted = true;
                 this._preview = await createSoundEvent(this.game.music.sndEvent);
                 this._preview.play();
