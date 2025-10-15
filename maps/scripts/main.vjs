@@ -1305,7 +1305,6 @@ class HachimiGame {
         return true;
     }
     updateText() {
-        Instance.Msg("update text");
         let headshotRate = this.gameplayStatus.headshot / (this.gameplayStatus.headshot + this.gameplayStatus.bodyshot);
         if (Number.isNaN(headshotRate)) {
             headshotRate = 0;
@@ -1690,11 +1689,13 @@ const instructions = {
     },
 };
 let superJumpEnabled = false;
-function enableSuperJump() {
+async function enableSuperJump() {
     if (superJumpEnabled) {
         return;
     }
     superJumpEnabled = true;
+    await nextTick();
+    Instance.ServerCommand("say \"MORE MORE JUMP\"");
     Instance.OnPlayerJump(async ({ player }) => {
         await nextTick();
         const velocity = player.GetAbsVelocity();
@@ -1702,7 +1703,6 @@ function enableSuperJump() {
             velocity: Vec.from(velocity).mul(2),
         });
     });
-    Instance.ServerCommand("say \"MORE MORE JUMP\"");
 }
 function main(memory) {
     Instance.Msg("Main");
@@ -1772,8 +1772,8 @@ function cleanUp() {
 Instance.OnActivate(main);
 Instance.OnScriptReload({
     before: cleanUp,
-    after: () => {
+    after: (memory) => {
         Instance.ServerCommand("endround");
-        main();
+        main(memory);
     },
 });

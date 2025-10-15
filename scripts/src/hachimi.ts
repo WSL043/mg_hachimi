@@ -742,8 +742,6 @@ export class HachimiGame {
     }
 
     updateText() {
-        Instance.Msg("update text");
-
         let headshotRate = this.gameplayStatus.headshot / (this.gameplayStatus.headshot + this.gameplayStatus.bodyshot);
         if (Number.isNaN(headshotRate)) {
             headshotRate = 0;

@@ -203,8 +203,8 @@ function cleanUp() {
 Instance.OnActivate(main);
 Instance.OnScriptReload({
     before: cleanUp,
-    after: () => {
+    after: (memory) => {
         Instance.ServerCommand("endround");
-        main();
+        main(memory);
     },
 });
