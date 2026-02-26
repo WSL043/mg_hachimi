@@ -352,6 +352,84 @@
 		vsnd_files = "sounds/songs/overkill_hachimi.vsnd"
 	}
 
+	"music.as_the_chimi_say" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/as_the_chimi_say.vsnd"
+	}
+	"music.chaochi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/chaochi.vsnd"
+	}
+	"music.chimi_rebirth" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/chimi_rebirth.vsnd"
+	}
+	"music.fireworks_hachimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/fireworks_hachimi.vsnd"
+	}
+	"music.hami_strike" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/hami_strike.vsnd"
+	}
+	"music.ha_ah" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/ha_ah.vsnd"
+	}
+	"music.isekai_mambo" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/isekai_mambo.vsnd"
+	}
+	"music.i_hate_my_chimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/i_hate_my_chimi.vsnd"
+	}
+	"music.loser_mambo" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/loser_mambo.vsnd"
+	}
+	"music.polynomial_chimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/polynomial_chimi.vsnd"
+	}
+	"music.water_hachimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		volume = 0.8
+		vsnd_files = "sounds/songs/water_hachimi.vsnd"
+	}
+
 	"effect.maodie_ha" =
 	{
 		type = "csgo_music"

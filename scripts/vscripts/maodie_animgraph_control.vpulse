@@ -1,6 +1,5 @@
 <!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
 {
-	generic_data_type = "Vpulse"
 	m_Cells =
 	[
 		{
@@ -359,14 +358,38 @@
 					m_nLastReadByInstruction = -1
 				},
 			]
-			m_InstructionEditorIDs =
+			m_InstructionDebugInfos =
 			[
-				-1,
-				-1,
-				-1,
-				-1,
-				-1,
-				-1,
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
 			]
 		},
 		{
@@ -432,11 +455,23 @@
 					m_nLastReadByInstruction = -1
 				},
 			]
-			m_InstructionEditorIDs =
+			m_InstructionDebugInfos =
 			[
-				-1,
-				-1,
-				-1,
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
 			]
 		},
 		{
@@ -565,14 +600,38 @@
 					m_nLastReadByInstruction = -1
 				},
 			]
-			m_InstructionEditorIDs =
+			m_InstructionDebugInfos =
 			[
-				-1,
-				-1,
-				-1,
-				-1,
-				-1,
-				-1,
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
 			]
 		},
 		{
@@ -722,15 +781,43 @@
 					m_nLastReadByInstruction = -1
 				},
 			]
-			m_InstructionEditorIDs =
+			m_InstructionDebugInfos =
 			[
-				-1,
-				-1,
-				-1,
-				-1,
-				-1,
-				-1,
-				-1,
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
 			]
 		},
 		{
@@ -796,11 +883,23 @@
 					m_nLastReadByInstruction = -1
 				},
 			]
-			m_InstructionEditorIDs =
+			m_InstructionDebugInfos =
 			[
-				-1,
-				-1,
-				-1,
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
 			]
 		},
 		{
@@ -929,14 +1028,38 @@
 					m_nLastReadByInstruction = -1
 				},
 			]
-			m_InstructionEditorIDs =
+			m_InstructionDebugInfos =
 			[
-				-1,
-				-1,
-				-1,
-				-1,
-				-1,
-				-1,
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
 			]
 		},
 		{
@@ -981,10 +1104,18 @@
 					m_nLastReadByInstruction = -1
 				},
 			]
-			m_InstructionEditorIDs =
+			m_InstructionDebugInfos =
 			[
-				-1,
-				-1,
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
+				{
+					m_nFlowNodeID = -1
+					m_nValueNodeID = -1
+					m_SequencePointName = "m_StepPoint"
+				},
 			]
 		},
 	]

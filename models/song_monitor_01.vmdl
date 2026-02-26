@@ -1,4 +1,4 @@
-<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc40:version{da0ab1f8-9722-4910-94b8-10b6a08c0934} -->
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc41:version{12fc9d44-453a-4ae4-b4d9-7e2ac0bbd4e0} -->
 {
 	rootNode = 
 	{
@@ -549,6 +549,171 @@
 							{
 								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
 								to = "materials/covers/manbol.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "as_the_chimi_say"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/as_the_chimi_say.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "chimi_rebirth"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/chimi_rebirth.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "fireworks_hachimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/fireworks_hachimi.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "loser_mambo"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/loser_mambo.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "water_hachimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/water_hachimi.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "chaochi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/chaochi.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "ha_ah"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/ha_ah.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "hami_strike"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/hami_strike.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "i_hate_my_chimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/i_hate_my_chimi.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "isekai_hachimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/isekai_mambo.vmat"
+							},
+							{
+								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "polynomial_chimi"
+						remaps = 
+						[
+							{
+								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
+								to = "materials/covers/polynomial_chimi.vmat"
 							},
 							{
 								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
