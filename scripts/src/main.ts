@@ -1,19 +1,16 @@
 import { Instance } from "cs_script/point_script";
 import { delay, nextTick, scheduleTick, tickCallback } from "./utils/scheduler";
-import { charts, Music } from "./musics";
+import { charts, hashChart, hashToMusic, Music } from "./musics";
 import { initButtonActions } from "./button_actions";
 import { checkTime } from "./cheat_detection";
 import { removeAllEntities } from "./utils/entity";
 import { HachimiGame } from "./hachimi";
 import { stopAllSound } from "./utils/sound";
 import { Vec } from "./utils/type_helper";
+import { GetPlayerSave, LoadOrCreatePlayerSave } from "./player_save";
 
 let scrInsConnection: undefined | number = undefined;
 let reloaded = false;
-
-let ctx: Context = {
-    spread: false,
-}
 
 let offset = 0;
 let index = 0;
@@ -36,13 +33,16 @@ const instructions: Record<string, (param: string) => void> = {
                     Speed: 1,
                 }],
                 WeaponDataList: []
-            }
+            },
+            hash: '',
         };
 
         offset = 0;
         Instance.Msg("Clear currentMusic");
     },
     End: () => {
+        currentMusic.hash = hashChart(currentMusic.chart);
+
         Instance.Msg(`Add Music: ${currentMusic.name} ${currentMusic.charter}, Note count: ${currentMusic.chart.NoteDataList.length}`);
 
         let index = charts.findIndex(v => v.name == currentMusic.name && v.charter == currentMusic.charter);
@@ -54,6 +54,7 @@ const instructions: Record<string, (param: string) => void> = {
         }
 
         charts.sort((a, b) => a.sort - b.sort);
+        hashToMusic[currentMusic.hash] = currentMusic;
     },
     Next: async () => {
         await nextTick();
@@ -104,7 +105,7 @@ async function enableSuperJump() {
     }
 
     superJumpEnabled = true;
-    
+
     await nextTick();
     Instance.ServerCommand("say \"MORE MORE JUMP\"");
     Instance.OnPlayerJump(async ({ player }) => {
@@ -116,15 +117,9 @@ async function enableSuperJump() {
     });
 }
 
-function main(memory?: Context) {
-    Instance.Msg("Main");
-    if (memory) {
-        ctx = memory;
-    }
-
+function main() {
     Instance.ServerCommand("mp_maxmoney 90000");
     Instance.ServerCommand("mp_buytime 65535");
-    Instance.ServerCommand("weapon_accuracy_nospread 1");
 
     const pulseent = Instance.FindEntityByName("pulseent");
     if (!pulseent) {
@@ -146,6 +141,8 @@ function main(memory?: Context) {
         Instance.Msg(`unknown action ${action}`);
     });
 
+    LoadOrCreatePlayerSave();
+
     Instance.SetThink(() => {
         tickCallback();
         Instance.SetNextThink(Instance.GetGameTime() + 1.0 / 64);
@@ -155,9 +152,30 @@ function main(memory?: Context) {
     Instance.ServerCommand(`exec _m_0`);
 
     Instance.OnRoundStart(() => {
-        initButtonActions(ctx);
+        initButtonActions();
         const inst = HachimiGame.init();
+        const playerSave = GetPlayerSave();
+
+        if (playerSave.weaponSpread) {
+            Instance.ServerCommand("weapon_accuracy_nospread 0");
+        } else {
+            Instance.ServerCommand("weapon_accuracy_nospread 1");
+        }
+
         scheduleTick(inst.onTick.bind(inst));
+
+        inst.trackTime = playerSave.trackTime;
+        inst.judgeOffset = playerSave.judgeOffset;
+        inst.judgeOption = playerSave.judgeOption;
+        inst.option = playerSave.chartOption;
+        inst.hitmarker = playerSave.hitmarker;
+
+        inst.updateOptionTexts();
+
+        if (playerSave.selectedMusicIndex >= 0 && playerSave.selectedMusicIndex < charts.length) {
+            inst.songList.setIndex(playerSave.selectedMusicIndex);
+            inst.clearStatus();
+        }
     });
 
     Instance.OnPlayerReset(({ player }) => {
@@ -197,14 +215,13 @@ function cleanUp() {
     removeAllEntities();
 
     scrInsConnection = undefined;
-    return ctx;
 }
 
 Instance.OnActivate(main);
 Instance.OnScriptReload({
     before: cleanUp,
-    after: (memory) => {
+    after: () => {
         Instance.ServerCommand("endround");
-        main(memory);
+        main();
     },
 });

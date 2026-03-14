@@ -3,6 +3,8 @@ import { HachimiGame } from "./hachimi";
 import { charts } from "./musics";
 import { createSoundEvent, SoundEffect } from "./utils/sound";
 import { nextTick, scheduleTick } from "./utils/scheduler";
+import { GetPlayerSave } from "./player_save";
+import { C } from "./constants";
 
 export class SongList {
     COUNT = 12;
@@ -124,6 +126,56 @@ export class SongList {
         }
     }
 
+    updateSavedDataText() {
+        const chart = charts[this.realDisplayIndex];
+        const save = GetPlayerSave();
+        let lastScoreText = 'SAVED DATA:\n\n';
+
+        const record = save.records[chart.hash];
+
+        if (record) {
+            const maxScore = chart.chart.NoteDataList.length * 4;
+            const percent = record.bestScore / maxScore;
+            const rate = C.RATE_PRECENTS.find(v => v.percent < percent || Math.abs(v.percent - percent) < 0.001)!.rate;
+
+            let statusMarks = [];
+            if (record.comboBreak == 0) {
+                statusMarks.push('FC');
+            }
+
+            if (record.bestHeadshotCount == chart.chart.NoteDataList.length) {
+                statusMarks.push('AHS');
+            }
+
+            if (!statusMarks.length) {
+                if (percent >= 0.5) {
+                    statusMarks.push('CLEAR');
+                } else {
+                    statusMarks.push('FAILED');
+                }
+            }
+
+            lastScoreText += `STATUS  : ${statusMarks.join(' ')}\n`;
+            lastScoreText += `RATING  : ${rate}\n`;
+            lastScoreText += `SCORE   : ${record.bestScore} / ${maxScore}\n`;
+            lastScoreText += `RETRIES : ${record.playCount}\n`;
+        } else {
+            lastScoreText += 'STATUS  : NO PLAY';
+        }
+
+        Instance.EntFireAtName({
+            name: `last_score_text`,
+            input: "SetMessage",
+            value: lastScoreText,
+        });
+
+        Instance.EntFireAtName({
+            name: `last_score_text_shadow`,
+            input: "SetMessage",
+            value: lastScoreText,
+        });
+    }
+
     async onTick() {
         if (this._displayIndex == this.index) {
             if (this.game.canStart &&
@@ -150,6 +202,7 @@ export class SongList {
             this._previewStarted = false;
             this.game.musicIndex = this.realDisplayIndex;
             this.game.updateMusic();
+            this.updateSavedDataText();
         }
 
         if (Math.abs(this._displayIndex - this.index) < 0.01) {

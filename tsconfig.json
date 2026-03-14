@@ -12,6 +12,7 @@
     // "lib": ["esnext"],
     // "types": ["node"],
     // and npm install -D @types/node
+    "moduleResolution": "bundler",
 
     // Other Outputs
     // "sourceMap": true,

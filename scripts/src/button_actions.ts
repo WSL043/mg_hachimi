@@ -1,6 +1,7 @@
 import { Instance } from "cs_script/point_script";
 import { HachimiGame } from "./hachimi";
 import { C, JudgeOpt, Opt } from "./constants";
+import { AlterPlayerSave } from "./player_save";
 
 function onSongItemHit(index: number) {
     return () => {
@@ -12,6 +13,8 @@ function onSongItemHit(index: number) {
         const mindex = inst.songList.calcIndexForItem(index);
         inst.songList.setIndex(mindex);
         inst.clearStatus();
+
+        AlterPlayerSave(s => s.selectedMusicIndex = mindex);
     }
 }
 
@@ -29,17 +32,8 @@ function greenNumberAdd(num: number) {
         inst.trackTime = 5;
     }
 
-    const greenNumber = Math.floor((inst.trackTime * 1000 * 3) / 5);
-    Instance.EntFireAtName({
-        name: "maodie_green_num_text",
-        input: "SetMessage",
-        value: `${greenNumber}F`
-    });
-    Instance.EntFireAtName({
-        name: "maodie_speed_text",
-        input: "SetMessage",
-        value: `${(inst.speed / 10).toFixed(2)} inch/s`
-    });
+    AlterPlayerSave(s => s.trackTime = inst.trackTime);
+    inst.updateOptionTexts();
 }
 
 function judgeOffsetAdd(num: number) {
@@ -56,15 +50,11 @@ function judgeOffsetAdd(num: number) {
         inst.judgeOffset = 1;
     }
 
-    const ms = Math.floor(inst.judgeOffset * 1000);
-    Instance.EntFireAtName({
-        name: "maodie_judge_offset_text",
-        input: "SetMessage",
-        value: `${ms}ms`
-    });
+    AlterPlayerSave(s => s.judgeOffset = inst.judgeOffset);
+    inst.updateOptionTexts();
 }
 
-export function initButtonActions(ctx: Context) {
+export function initButtonActions() {
     for (let i = 0; i < 12; i++) {
         const item = Instance.FindEntityByName(`song_item_${i}`);
         if (!item) {
@@ -76,14 +66,11 @@ export function initButtonActions(ctx: Context) {
     }
 
     Instance.OnScriptInput("ToggleWeaponSpread", () => {
-        ctx.spread = !ctx.spread;
+        const ctx = AlterPlayerSave(s => s.weaponSpread = !s.weaponSpread);
 
-        Instance.ServerCommand("weapon_accuracy_nospread " + (ctx.spread ? '0' : '1'));
-        Instance.EntFireAtName({
-            name: "weapon_spread_display",
-            input: "SetMessage",
-            value: ctx.spread ? 'ON' : 'OFF'
-        });
+        Instance.ServerCommand("weapon_accuracy_nospread " + (ctx.weaponSpread ? '0' : '1'));
+
+        HachimiGame.instance?.updateOptionTexts();
     });
 
     Instance.OnScriptInput("ToggleHitmarker", () => {
@@ -93,11 +80,8 @@ export function initButtonActions(ctx: Context) {
         }
 
         inst.hitmarker = !inst.hitmarker;
-        Instance.EntFireAtName({
-            name: "hitmarker_display",
-            input: "SetMessage",
-            value: inst.hitmarker ? 'ON' : 'OFF'
-        });
+        AlterPlayerSave(s => s.hitmarker = inst.hitmarker);
+        inst.updateOptionTexts();
     });
 
     Instance.OnScriptInput("ToggleAutoPlay", () => {
@@ -123,14 +107,11 @@ export function initButtonActions(ctx: Context) {
         if (inst.judgeOption + 1 > JudgeOpt.Easy) {
             inst.judgeOption = JudgeOpt.Normal;
         } else {
-            inst.judgeOption = inst.option + 1;
+            inst.judgeOption = inst.judgeOption + 1;
         }
 
-        Instance.EntFireAtName({
-            name: "judge_opt_display",
-            input: "SetMessage",
-            value: C.JUDGE_OPTION_TO_TEXT[inst.judgeOption] ?? 'NORMAL'
-        });
+        AlterPlayerSave(s => s.judgeOption = inst.judgeOption);
+        inst.updateOptionTexts();
     });
 
     Instance.OnScriptInput("ToggleOption", () => {
@@ -145,11 +126,8 @@ export function initButtonActions(ctx: Context) {
             inst.option = inst.option + 1;
         }
 
-        Instance.EntFireAtName({
-            name: "option_display",
-            input: "SetMessage",
-            value: C.OPTION_TO_TEXT[inst.option] ?? 'OFF'
-        });
+        AlterPlayerSave(s => s.chartOption = inst.option);
+        inst.updateOptionTexts();
     });
 
     Instance.OnScriptInput("HachimiStart", () => {

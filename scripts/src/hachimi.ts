@@ -7,6 +7,7 @@ import { HitmarkerController } from "./hitmarker_controller";
 import { Frame, JUDGE_POINT, Note, NotePool } from "../src/note";
 import { SongList } from "./song_list";
 import { delay, delaySec, nextTick } from "./utils/scheduler";
+import { AlterPlayerSave, GetPlayerSave } from "./player_save";
 
 function prependSpace(value: { toString: () => string }, count: number = 12) {
     return value.toString().padStart(count, ' ');
@@ -43,6 +44,52 @@ export class HachimiGame {
     _pool = new NotePool();
 
     songList = new SongList(this);
+
+    updateOptionTexts() {
+        const greenNumber = Math.floor((this.trackTime * 1000 * 3) / 5);
+        Instance.EntFireAtName({
+            name: "maodie_green_num_text",
+            input: "SetMessage",
+            value: `${greenNumber}F`
+        });
+        Instance.EntFireAtName({
+            name: "maodie_speed_text",
+            input: "SetMessage",
+            value: `${(this.speed / 10).toFixed(2)} inch/s`
+        });
+
+        const ms = Math.floor(this.judgeOffset * 1000);
+        Instance.EntFireAtName({
+            name: "maodie_judge_offset_text",
+            input: "SetMessage",
+            value: `${ms}ms`
+        });
+
+        const ctx = GetPlayerSave();
+        Instance.EntFireAtName({
+            name: "weapon_spread_display",
+            input: "SetMessage",
+            value: ctx.weaponSpread ? 'ON' : 'OFF'
+        });
+
+        Instance.EntFireAtName({
+            name: "hitmarker_display",
+            input: "SetMessage",
+            value: this.hitmarker ? 'ON' : 'OFF'
+        });
+
+        Instance.EntFireAtName({
+            name: "judge_opt_display",
+            input: "SetMessage",
+            value: C.JUDGE_OPTION_TO_TEXT[this.judgeOption] ?? 'NORMAL'
+        });
+
+        Instance.EntFireAtName({
+            name: "option_display",
+            input: "SetMessage",
+            value: C.OPTION_TO_TEXT[this.option] ?? 'OFF'
+        });
+    }
 
     calculateNoteFrames(noteIndex: number, noteData: NoteData) {
         const self = this;
@@ -333,6 +380,7 @@ export class HachimiGame {
         offset: 0,
         late: 0,
         early: 0,
+        comboBreak: 0,
     };
 
     judgeTipControllers: JudgeTipController[] = [];
@@ -411,6 +459,51 @@ export class HachimiGame {
         this.noteObjs.push(note);
     }
 
+    saveScore() {
+        if (this.autoplay) {
+            return;
+        }
+
+        AlterPlayerSave(s => {
+            const record = s.records[this.music.hash] ?? {
+                playCount: 0,
+                bestCombo: 0,
+                bestScore: 0,
+                comboBreak: this.music.chart.NoteDataList.length,
+                bestHeadshotCount: 0,
+            }
+
+            record.playCount++;
+
+            if (this.gameplayStatus.combo > record.bestCombo) {
+                record.bestCombo = this.gameplayStatus.combo;
+            }
+
+            const score = this.gameplayStatus.perfect * 3 +
+                this.gameplayStatus.great * 2 +
+                this.gameplayStatus.good * 1 +
+                this.gameplayStatus.headshot;
+
+            if (score > record.bestScore) {
+                record.bestScore = score;
+            }
+
+            if (this.gameplayStatus.comboBreak < record.comboBreak) {
+                record.comboBreak = this.gameplayStatus.comboBreak;
+            }
+
+            if (this.gameplayStatus.headshot > record.bestHeadshotCount) {
+                record.bestHeadshotCount = this.gameplayStatus.headshot;
+            }
+
+            s.records[this.music.hash] = record;
+        });
+
+        this.songList.updateSavedDataText();
+
+        // TODO: play full combo or all perfect voice line
+    }
+
     onTick() {
         this.processKilledTargets();
 
@@ -460,7 +553,10 @@ export class HachimiGame {
             this.lastWeaponIndex++;
         }
 
-        if (this.lastNoteIndex >= this.notes.length) {
+        if (this.lastNoteIndex >= this.notes.length &&
+            this.noteProgress === this.chart.NoteDataList.length
+        ) {
+            this.saveScore();
             this.stop(true);
         }
     }
@@ -509,6 +605,7 @@ export class HachimiGame {
             offset: 0,
             late: 0,
             early: 0,
+            comboBreak: 0,
         };
 
         this.updateText();
@@ -704,6 +801,7 @@ export class HachimiGame {
             }
 
             this.gameplayStatus.combo = 0;
+            this.gameplayStatus.comboBreak++;
         }
 
         if (this.gameplayStatus.combo > 5) {
@@ -807,7 +905,7 @@ export class HachimiGame {
             });
         }
 
-        if (this.gameplayStatus.bad == 0 && this.gameplayStatus.poor == 0) {
+        if (this.gameplayStatus.comboBreak == 0) {
             status.push('FULL COMBO');
             Instance.EntFireAtName({
                 name: "fc_indicator",
