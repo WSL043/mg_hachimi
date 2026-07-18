@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 2,
+  "packageVersion": "0.1.0-test.3",
+  "addonName": "mg_hachimi_community_fix",
+  "workshopItemId": "3500104891",
+  "workshopPrefix": "3500104891",
+  "sourceWorkshopFiles": [
+    {
+      "path": "3500104891_000.vpk",
+      "length": 104946525,
+      "sha256": "A3CD6691C531361B54BDB0D0628D91256EA687F70B605E80F4561E8715971216"
+    },
+    {
+      "path": "3500104891_001.vpk",
+      "length": 106506766,
+      "sha256": "5FCDE7AB4B2997893A515F5DDDA6557230EF6C187BAF54B4AFD9795F9A7EB9E1"
+    },
+    {
+      "path": "3500104891_002.vpk",
+      "length": 30886447,
+      "sha256": "8B691744503F559D0F3708A39D686BC18E9BF8DC80B450F54E6829590675B541"
+    },
+    {
+      "path": "3500104891_dir.vpk",
+      "length": 25207,
+      "sha256": "8BF6D8DEDD3480736A583888FB2044DD6603DCA9D7AAE9D0A4DB21132AB2BDC6"
+    }
+  ],
+  "patchedWorkshopFiles": {
+    "FixOnly": [
+      {
+        "path": "3500104891_000.vpk",
+        "length": 104946525,
+        "sha256": "A3CD6691C531361B54BDB0D0628D91256EA687F70B605E80F4561E8715971216"
+      },
+      {
+        "path": "3500104891_001.vpk",
+        "length": 106506766,
+        "sha256": "5FCDE7AB4B2997893A515F5DDDA6557230EF6C187BAF54B4AFD9795F9A7EB9E1"
+      },
+      {
+        "path": "3500104891_002.vpk",
+        "length": 48976481,
+        "sha256": "93498D92551800FD0A22B77BFF1698F4B7A694A955D59F9C457F0F3A7A9DB06A"
+      },
+      {
+        "path": "3500104891_dir.vpk",
+        "length": 18683,
+        "sha256": "E5A41EC951AF506C8FBBC73198C49325EBCEC94A5D9C78B1E87532F20A14AA6A"
+      }
+    ],
+    "FixPlusSongs": [
+      {
+        "path": "3500104891_000.vpk",
+        "length": 104946525,
+        "sha256": "A3CD6691C531361B54BDB0D0628D91256EA687F70B605E80F4561E8715971216"
+      },
+      {
+        "path": "3500104891_001.vpk",
+        "length": 106506766,
+        "sha256": "5FCDE7AB4B2997893A515F5DDDA6557230EF6C187BAF54B4AFD9795F9A7EB9E1"
+      },
+      {
+        "path": "3500104891_002.vpk",
+        "length": 52039413,
+        "sha256": "7D55D3F4E8C44917B145DBC09F523F72FAB540A34C5CC42AF02DA32739AA6920"
+      },
+      {
+        "path": "3500104891_dir.vpk",
+        "length": 18947,
+        "sha256": "017E9D9CF35F9E82563B11C7273C3A0E2BD25398B498846641F755BF46C1C045"
+      }
+    ]
+  },
+  "legacyPatchedWorkshopFiles": [
+    {
+      "id": "previous-preview-patch",
+      "files": [
+        {
+          "path": "3500104891_000.vpk",
+          "length": 104946525,
+          "sha256": "A3CD6691C531361B54BDB0D0628D91256EA687F70B605E80F4561E8715971216"
+        },
+        {
+          "path": "3500104891_001.vpk",
+          "length": 106506766,
+          "sha256": "5FCDE7AB4B2997893A515F5DDDA6557230EF6C187BAF54B4AFD9795F9A7EB9E1"
+        },
+        {
+          "path": "3500104891_002.vpk",
+          "length": 55586879,
+          "sha256": "120A9FDD3E1AA03B61C609389E51F65ACDAC1DD5916057DF6DE9F49A7DD7020E"
+        },
+        {
+          "path": "3500104891_dir.vpk",
+          "length": 19251,
+          "sha256": "D8A92E7B3B37142967BD801A6ADA9EBB3A39565F1456EF2A98687BB353C0299B"
+        }
+      ]
+    }
+  ],
+  "baseFiles": [
+    {
+      "path": "maps/mg_hachimi.vpk",
+      "length": 18056148,
+      "sha256": "8AFDA7DE9399E14A1ADC93D493A1A021D94015094B6A576E83EA7B328EB03FA6"
+    },
+    {
+      "path": "maps/scripts/main.vjs_c",
+      "length": 33886,
+      "sha256": "7E33D48F8B54773503E05AE8B9FD516E2CE7E2B42C59710CFCB09E0D16D1A3AE"
+    }
+  ]
+}
