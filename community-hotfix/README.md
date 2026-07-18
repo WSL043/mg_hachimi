@@ -29,7 +29,7 @@ Running the installer again with the same edition is also safe: it recognizes th
 - `Diagnostics.cmd`: validate package, Workshop, backup, state, and environment; then create a support ZIP.
 - `Uninstall.cmd`: restore the verified original Workshop files.
 
-The launchers do not use `-tools` or `-addon`; only the normal Counter-Strike 2 window should appear. They do use `-insecure` because this is a locally modified Workshop item. Do not enter matchmaking from that session; close CS2 and start it normally before matchmaking.
+The launchers do not use `-tools`, `-addon`, or `-insecure`; they start a normal Counter-Strike 2 process. The patched map was verified to load without disabling secure matchmaking.
 
 Permanent extra disk use is approximately 242 MB for the rollback backup plus 18 MB for FixOnly or 21 MB for FixPlusSongs inside the patched Workshop item. Temporary build space is released after installation. The downloadable package contains only the patch resources and installer.
 

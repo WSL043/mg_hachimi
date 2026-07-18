@@ -29,7 +29,7 @@
 - `Diagnostics.cmd`：检查包体、Workshop、备份、状态和运行环境，并生成可上传到 Issue 的 ZIP。
 - `Uninstall.cmd`：恢复已验证的原始 Workshop 文件。
 
-启动器不使用 `-tools` 和 `-addon`，只会出现普通 Counter-Strike 2 游戏窗口。由于本地 Workshop 文件经过修改，启动器会使用 `-insecure`；不要从该次会话进入匹配。需要匹配时先关闭 CS2，再从 Steam 正常启动。
+启动器不使用 `-tools`、`-addon` 或 `-insecure`，启动的是普通 Counter-Strike 2 进程。修补后的地图已经验证可以在不禁用安全匹配的情况下正常载入。
 
 永久额外占用约为：回退备份 242 MB，加上 Workshop 中“只修复”约 18 MB 或“修复＋歌曲”约 21 MB 的增量。安装时的临时构建目录会自动清理；下载包本身只包含补丁资源和安装器。
 
