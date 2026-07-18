@@ -4,12 +4,6 @@ Unofficial compatibility hotfix for Workshop item `3500104891`.
 
 It restores target movement and orientation, song-list scrolling and hit-area alignment, monitor titles, and judge-tip visibility. It also removes leaked debug/save text. An optional edition adds the community-submitted **Unwelcome ChiMi** chart.
 
-## Visual check
-
-| Before: targets stuck and lying on the track | After: upright, fully visible, and flowing through autoplay |
-| --- | --- |
-| ![Broken targets before the hotfix](docs/screenshots/targets-before.png) | ![Working targets after the hotfix](docs/screenshots/hotfix-after.png) |
-
 ## Install
 
 [Download from Releases](https://github.com/WSL043/mg_hachimi/releases)
