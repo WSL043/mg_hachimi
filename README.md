@@ -8,6 +8,8 @@ The current test build restores target movement/orientation, song-list scrolling
 
 The broken `0.1.0-test.1` standalone-addon release has been withdrawn. Use `0.1.0-test.2` or newer only.
 
+[Download `0.1.0-test.2`](https://github.com/WSL043/mg_hachimi/releases/tag/community-hotfix-v0.1.0-test.2) · [Direct ZIP](https://github.com/WSL043/mg_hachimi/releases/download/community-hotfix-v0.1.0-test.2/mg_hachimi-community-hotfix-0.1.0-test.2.zip)
+
 1. Subscribe to Workshop item `3500104891` and let Steam finish downloading it.
 2. Download and extract the current hotfix release.
 3. Run `community-hotfix/Install.cmd` and choose **Fix only** or **Fix + preview songs**.
