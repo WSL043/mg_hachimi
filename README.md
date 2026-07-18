@@ -16,8 +16,8 @@ It restores target movement and orientation, song-list scrolling and hit-area al
 
 1. Subscribe to Workshop item `3500104891` and let Steam finish downloading it.
 2. Download and extract the current hotfix release.
-3. Run `community-hotfix/Install.cmd` and choose **Fix only** or **Fix + preview songs**.
-4. Run `community-hotfix/Launch.cmd`, then choose Perfect World or Worldwide.
+3. Open the extracted `mg_hachimi-community-hotfix` folder and run `Install.cmd`; choose **Fix only** or **Fix + preview song**.
+4. Run `Launch.cmd`, then choose Perfect World or Worldwide.
 
 The installer makes a verified rollback backup and directly patches the already-subscribed Workshop VPKs, so no second map subscription or Workshop Tools mode is needed. It refuses unknown map versions. `Uninstall.cmd` restores the verified original Workshop files; `Diagnostics.cmd` creates a support ZIP for [Issue reports](https://github.com/WSL043/mg_hachimi/issues).
 
@@ -28,4 +28,4 @@ Installation is normally one-time. The launcher checks hashes on each run and on
 
 ## Support
 
-For a reproducible problem, run `community-hotfix/Diagnostics.cmd` and open a [new Issue](https://github.com/WSL043/mg_hachimi/issues) with the generated ZIP, a screenshot if relevant, and the action that triggered it.
+For a reproducible problem, run `Diagnostics.cmd` in the extracted package and open a [new Issue](https://github.com/WSL043/mg_hachimi/issues) with the generated ZIP, a screenshot if relevant, and the action that triggered it.
