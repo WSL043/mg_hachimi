@@ -8,6 +8,8 @@ This fork does not replace the original author. When the Workshop version is fix
 
 ## Install
 
+[Download the current test release](https://github.com/WSL043/mg_hachimi/releases/tag/community-hotfix-v0.1.0-test.1). Package status and support reports are tracked in [Issue #1](https://github.com/WSL043/mg_hachimi/issues/1).
+
 1. Subscribe to Workshop item `3500104891` and let Steam finish downloading it.
 2. Download the hotfix release and extract it.
 3. Run `community-hotfix/Install.cmd`.
