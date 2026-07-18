@@ -723,21 +723,6 @@
 					},
 					{
 						_class = "MaterialGroup"
-						name = "a_world_i_built_for_you"
-						remaps =
-						[
-							{
-								from = "materials/covers/manbo_manbo_sometimes_hachimi.vmat"
-								to = "materials/covers/a_world_i_built_for_you.vmat"
-							},
-							{
-								from = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-								to = "models/generic/retro_monitor_01/retro_monitor_01_clean.vmat"
-							},
-						]
-					},
-					{
-						_class = "MaterialGroup"
 						name = "unwelcome_chimi"
 						remaps =
 						[
