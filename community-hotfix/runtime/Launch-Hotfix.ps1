@@ -95,7 +95,7 @@ try {
     else {
         $arguments += '-worldwide'
     }
-    $arguments += @('-insecure', '-novid')
+    $arguments += '-novid'
     if (-not $NoAutoMap) {
         $arguments += @('+map_workshop', $script:WorkshopItemId, 'mg_hachimi')
     }
