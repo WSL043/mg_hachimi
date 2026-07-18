@@ -1,5 +1,4 @@
 import { Instance } from "cs_script/point_script";
-import { Col } from "./utils/type_helper";
 
 interface MusicResult {
     playCount: number;
@@ -59,14 +58,6 @@ export function AlterPlayerSave(modifier: (save: SaveData) => void): SaveData {
 
     modifier(playerSave);
     Instance.SetSaveData(JSON.stringify(playerSave));
-
-    Instance.DebugScreenText({
-        text: JSON.stringify(playerSave, undefined, 2),
-        x: 100,
-        y: 100,
-        color: new Col(255, 255, 255),
-        duration: 0.5,
-    })
 
     return playerSave;
 }

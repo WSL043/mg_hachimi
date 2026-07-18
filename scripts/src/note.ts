@@ -1,4 +1,4 @@
-import { BaseModelEntity, Entity, Instance } from "cs_script/point_script";
+import { BaseModelEntity, Instance } from "cs_script/point_script";
 import { C } from "./constants";
 import { createEntity } from "./utils/entity";
 import { Vec } from "./utils/type_helper";
@@ -17,29 +17,53 @@ const LEFT_LANE = 896;
 const SPACE = 64;
 export const JUDGE_POINT = 0.93;
 
-let lastTargetName: string = '';
-function setAnimgraphParam(targetname: string, paramName: string, param: number | boolean | string) {
-    if (targetname != lastTargetName) {
-        Instance.EntFireAtName({
-            name: "pulseent",
-            input: "SetTarget",
-            value: targetname
-        });
-        lastTargetName = targetname;
-    }
-
-    Instance.EntFireAtName({
-        name: "pulseent",
-        input: `Set${paramName}`,
-        value: param,
-    });
-}
+// The July 2026 AnimGraph2 update no longer instantiates the legacy graph used
+// by this model. Its old Position graph was only a two-frame linear path, so
+// drive that same path directly from point_script instead.
+const TARGET_TRAVEL = new Vec(0, -1351.6422, -418.3654);
+const TARGET_UP_ANGLES = { pitch: 0, yaw: 0, roll: 90 };
+const TARGET_DOWN_ANGLES = { pitch: 0, yaw: 0, roll: 0 };
+// The old flip animation pivoted around the target's lower edge. Rotating the
+// whole prop pivots around its center instead, so lift it by half its height.
+const TARGET_UP_OFFSET = new Vec(0, 0, 44);
 
 export class Note {
     _body: BaseModelEntity = null!;
     _head: BaseModelEntity = null!;
     _blocker: BaseModelEntity = null!;
     targetPos: Vec = Vec.zero();
+
+    private updateTransform() {
+        if (!this._body?.IsValid()) {
+            return;
+        }
+
+        const position = this.targetPos
+            .add(TARGET_TRAVEL.mul(this._positon))
+            .add(this._up ? TARGET_UP_OFFSET : Vec.zero());
+        const angles = this._up ? TARGET_UP_ANGLES : TARGET_DOWN_ANGLES;
+        for (const entity of [this._body, this._head, this._blocker]) {
+            if (entity?.IsValid()) {
+                entity.Teleport({ position, angles });
+            }
+        }
+    }
+
+    private updateFlip() {
+        if (!this._body?.IsValid()) {
+            return;
+        }
+
+        // AnimGraph2 no longer applies the old tag.target flip. Rotate all
+        // three independent props together so their visible and collision
+        // planes stay aligned.
+        const angles = this._up ? TARGET_UP_ANGLES : TARGET_DOWN_ANGLES;
+        for (const entity of [this._body, this._head, this._blocker]) {
+            if (entity?.IsValid()) {
+                entity.Teleport({ angles });
+            }
+        }
+    }
 
     async init(id: number) {
         const targetname = "mt_" + id
@@ -63,25 +87,9 @@ export class Note {
                 solid: 6,
             }),
         ]);
-
-
-        this._head.SetParent(this._body);
-        this._blocker.SetParent(this._body);
-
-        Instance.EntFireAtTarget({
-            target: this._head,
-            input: 'SetParentAttachment',
-            value: 'target',
-        });
-
-        Instance.EntFireAtTarget({
-            target: this._blocker,
-            input: 'SetParentAttachment',
-            value: 'target',
-        });
-
         Instance.ConnectOutput(this._head, "OnTakeDamage", () => this._cb ? this._cb(0) : undefined);
         Instance.ConnectOutput(this._body, "OnTakeDamage", () => this._cb ? this._cb(1) : undefined);
+        this.updateFlip();
     }
 
     private _up = false;
@@ -94,8 +102,8 @@ export class Note {
             return;
         }
 
-        setAnimgraphParam(this._body.GetEntityName(), "IsUp", value);
         this._up = value;
+        this.updateTransform();
     }
 
     private _positon = 0.0;
@@ -108,8 +116,8 @@ export class Note {
             return;
         }
 
-        setAnimgraphParam(this._body.GetEntityName(), "Position", value);
         this._positon = value;
+        this.updateTransform();
     }
 
     set bodygroup(value: number) {
@@ -155,9 +163,9 @@ export class Note {
             value: "0",
         });
         
-        this._body.Teleport({
-            position: Vec.zero(),
-        });
+        for (const entity of [this._body, this._head, this._blocker]) {
+            entity.Teleport({ position: Vec.zero() });
+        }
     }
 
     show() {
@@ -177,9 +185,7 @@ export class Note {
             value: "1",
         });
 
-        this._body.Teleport({
-            position: this.targetPos,
-        });
+        this.updateTransform();
     }
 
     addFrame(keyframe: Frame) {
@@ -312,8 +318,8 @@ export class NotePool {
             await result.init(this._lastNoteIndex++);
         }
 
-        result.reset();
         result.targetPos = new Vec(LEFT_LANE + lane * SPACE, LANE_START, LANE_HEIGHT);
+        result.reset();
         return result;
     }
 

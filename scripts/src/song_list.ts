@@ -1,10 +1,17 @@
-import { Instance } from "cs_script/point_script";
+import { BaseModelEntity, Instance } from "cs_script/point_script";
 import { HachimiGame } from "./hachimi";
 import { charts } from "./musics";
 import { createSoundEvent, SoundEffect } from "./utils/sound";
 import { nextTick, scheduleTick } from "./utils/scheduler";
 import { GetPlayerSave } from "./player_save";
 import { C } from "./constants";
+import { Vec } from "./utils/type_helper";
+
+// AnimGraph2 no longer updates this model's animated attachment hierarchy.
+// Reproduce the old 24-frame root motion so row spacing and the center marker
+// stay aligned with the model's title/chart attachments.
+const SONG_ITEM_ORIGIN = new Vec(767.4844970703, 355.125, 398.375);
+const SONG_ITEM_TRAVEL = new Vec(6.8190979, 3.937008, 78.740158);
 
 export class SongList {
     COUNT = 12;
@@ -21,6 +28,8 @@ export class SongList {
     _previewStarted = false;
 
     _lastChangeTime = 0;
+    _items: (BaseModelEntity | undefined)[] = [];
+    _itemEnabled: (boolean | undefined)[] = [];
 
     constructor(
         private readonly game: HachimiGame
@@ -32,23 +41,27 @@ export class SongList {
     }
 
     private setItemProgress(index: number, progress: number) {
-        Instance.EntFireAtName({
-            name: 'pulseent',
-            input: "SetSongItem",
-            value: `song_item_${index}`
-        });
-        Instance.EntFireAtName({
-            name: "pulseent",
-            input: 'SetSongItemProgress',
-            value: progress
+        let item = this._items[index];
+        if (!item?.IsValid()) {
+            item = Instance.FindEntityByName(`song_item_${index}`) as BaseModelEntity | undefined;
+            this._items[index] = item;
+        }
+
+        item?.Teleport({
+            position: SONG_ITEM_ORIGIN.add(SONG_ITEM_TRAVEL.mul(progress)),
         });
     }
 
     private setItemAlpha(index: number, alpha: number) {
+        const enabled = alpha >= 254.5;
+        if (this._itemEnabled[index] == enabled) {
+            return;
+        }
+        this._itemEnabled[index] = enabled;
+
         Instance.EntFireAtName({
             name: `song_item_${index}`,
-            input: 'Alpha',
-            value: alpha,
+            input: enabled ? "Enable" : "Disable",
         });
     }
 
@@ -211,7 +224,6 @@ export class SongList {
             this.game.updateMusic();
 
             this._lastChangeTime = Instance.GetGameTime();
-            Instance.ServerCommand("say " + this.game.music.name);
         }
 
         for (let i = 0; i < this.COUNT; i++) {
@@ -238,11 +250,9 @@ export class SongList {
                     this.setItemChart(i, chart.charter);
                 }
 
-                if (progress > 0.45 && progress < 0.55) {
-                    this.setItemChartScale(i, (1.0 - (Math.abs(0.5 - progress) / 0.05)));
-                } else {
-                    this.setItemChartScale(i, 0);
-                }
+                // AnimGraph2 no longer supplies the old chart attachment offset,
+                // so the charter sublabel overlaps the song title at the center.
+                this.setItemChartScale(i, 0);
 
                 this.setItemTextScale(i, 1);
             }
