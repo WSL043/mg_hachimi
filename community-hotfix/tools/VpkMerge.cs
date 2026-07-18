@@ -20,6 +20,15 @@ namespace MgHachimiHotfix
         public long DataBytes { get; internal set; }
     }
 
+    public sealed class VpkPatchResult
+    {
+        public int OriginalEntryCount { get; internal set; }
+        public int PatchedEntryCount { get; internal set; }
+        public int ReplacedEntryCount { get; internal set; }
+        public int AddedEntryCount { get; internal set; }
+        public long AppendedBytes { get; internal set; }
+    }
+
     public static class VpkMerger
     {
         private const uint Magic = 0x55AA1234;
@@ -180,6 +189,191 @@ namespace MgHachimiHotfix
                 EntryCount = entryCount,
                 DataBytes = dataBytes
             };
+        }
+
+        public static VpkPatchResult CreatePatchedSplit(
+            string directoryVpkPath,
+            string chunkDirectory,
+            string sourcePrefix,
+            IDictionary<string, string> overlayFiles,
+            string outputDirectory,
+            string outputPrefix)
+        {
+            if (overlayFiles == null || overlayFiles.Count == 0)
+            {
+                throw new ArgumentException("At least one overlay file is required.", "overlayFiles");
+            }
+            if (string.IsNullOrWhiteSpace(outputPrefix) || Path.GetFileName(outputPrefix) != outputPrefix)
+            {
+                throw new ArgumentException("Output prefix must be a file-name component.", "outputPrefix");
+            }
+
+            byte[] tree;
+            using (var input = File.OpenRead(directoryVpkPath))
+            using (var reader = new BinaryReader(input, Encoding.UTF8, false))
+            {
+                if (reader.ReadUInt32() != Magic)
+                {
+                    throw new InvalidDataException("Invalid VPK signature.");
+                }
+                if (reader.ReadUInt32() != 2)
+                {
+                    throw new InvalidDataException("Only VPK version 2 is supported.");
+                }
+
+                uint treeSize = reader.ReadUInt32();
+                uint embeddedDataSize = reader.ReadUInt32();
+                reader.ReadUInt32(); // Archive MD5 section size.
+                reader.ReadUInt32(); // Other MD5 section size.
+                reader.ReadUInt32(); // Signature section size.
+
+                if (embeddedDataSize != 0)
+                {
+                    throw new InvalidDataException("Expected a split Workshop VPK with no embedded data.");
+                }
+                if (treeSize > int.MaxValue)
+                {
+                    throw new InvalidDataException("VPK tree is too large.");
+                }
+
+                tree = reader.ReadBytes((int)treeSize);
+                if (tree.Length != (int)treeSize)
+                {
+                    throw new EndOfStreamException("VPK tree is truncated.");
+                }
+            }
+
+            var entries = ParseTree(tree);
+            int originalEntryCount = entries.Count;
+            var entriesByPath = new Dictionary<string, VpkEntry>(StringComparer.OrdinalIgnoreCase);
+            foreach (var entry in entries)
+            {
+                string relativePath = GetEntryPath(entry);
+                if (entriesByPath.ContainsKey(relativePath))
+                {
+                    throw new InvalidDataException("Duplicate VPK path rejected: " + relativePath);
+                }
+                entriesByPath.Add(relativePath, entry);
+            }
+
+            var chunks = FindChunks(chunkDirectory, sourcePrefix);
+            if (chunks.Count == 0)
+            {
+                throw new InvalidDataException("No VPK chunks were found.");
+            }
+
+            string outputRoot = Path.GetFullPath(outputDirectory).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            Directory.CreateDirectory(outputRoot);
+            var outputPaths = new List<string>();
+            var outputChunks = new Dictionary<ushort, string>();
+            string outputDirectoryVpk = Path.Combine(outputRoot, outputPrefix + "_dir.vpk");
+            if (File.Exists(outputDirectoryVpk))
+            {
+                throw new IOException("Output VPK already exists: " + outputDirectoryVpk);
+            }
+
+            try
+            {
+                foreach (var chunk in chunks)
+                {
+                    string outputChunk = Path.Combine(outputRoot, outputPrefix + "_" + chunk.Index.ToString("000") + ".vpk");
+                    if (File.Exists(outputChunk))
+                    {
+                        throw new IOException("Output VPK already exists: " + outputChunk);
+                    }
+                    File.Copy(chunk.Path, outputChunk, false);
+                    outputPaths.Add(outputChunk);
+                    outputChunks.Add(chunk.Index, outputChunk);
+                }
+
+                Chunk appendChunk = chunks[chunks.Count - 1];
+                string appendChunkPath = outputChunks[appendChunk.Index];
+                long appendedBytes = 0;
+                int replaced = 0;
+                int added = 0;
+                var overlayPaths = new List<string>(overlayFiles.Keys);
+                overlayPaths.Sort(StringComparer.OrdinalIgnoreCase);
+
+                using (var output = new FileStream(appendChunkPath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                {
+                    foreach (string requestedPath in overlayPaths)
+                    {
+                        string relativePath = NormalizeRelativePath(requestedPath);
+                        string sourcePath = Path.GetFullPath(overlayFiles[requestedPath]);
+                        if (!File.Exists(sourcePath))
+                        {
+                            throw new FileNotFoundException("Overlay file is missing.", sourcePath);
+                        }
+
+                        long sourceLength = new FileInfo(sourcePath).Length;
+                        if (sourceLength > uint.MaxValue)
+                        {
+                            throw new InvalidDataException("Overlay file exceeds the VPK size limit: " + relativePath);
+                        }
+                        if (output.Position > uint.MaxValue || output.Position + sourceLength > uint.MaxValue)
+                        {
+                            throw new InvalidDataException("Patched VPK chunk exceeds the version 2 size limit.");
+                        }
+
+                        uint crc;
+                        using (var source = File.OpenRead(sourcePath))
+                        {
+                            crc = ComputeCrc32(source);
+                            source.Position = 0;
+                            CopyToEnd(source, output);
+                        }
+
+                        VpkEntry entry;
+                        if (entriesByPath.TryGetValue(relativePath, out entry))
+                        {
+                            replaced++;
+                        }
+                        else
+                        {
+                            entry = CreateEntry(relativePath);
+                            entries.Add(entry);
+                            entriesByPath.Add(relativePath, entry);
+                            added++;
+                        }
+
+                        entry.Crc32 = crc;
+                        entry.Preload = new byte[0];
+                        entry.ArchiveIndex = appendChunk.Index;
+                        entry.EntryOffset = checked((uint)(output.Position - sourceLength));
+                        entry.EntryLength = checked((uint)sourceLength);
+                        appendedBytes += sourceLength;
+                    }
+                }
+
+                byte[] patchedTree = SerializeTree(entries);
+                WriteDirectoryVpk(outputDirectoryVpk, patchedTree);
+                outputPaths.Add(outputDirectoryVpk);
+                Verify(outputDirectoryVpk);
+
+                return new VpkPatchResult
+                {
+                    OriginalEntryCount = originalEntryCount,
+                    PatchedEntryCount = entries.Count,
+                    ReplacedEntryCount = replaced,
+                    AddedEntryCount = added,
+                    AppendedBytes = appendedBytes
+                };
+            }
+            catch
+            {
+                foreach (string outputPath in outputPaths)
+                {
+                    if (File.Exists(outputPath))
+                    {
+                        File.Delete(outputPath);
+                    }
+                }
+                if (File.Exists(outputDirectoryVpk))
+                {
+                    File.Delete(outputDirectoryVpk);
+                }
+                throw;
+            }
         }
 
         public static VpkMergeResult Merge(string directoryVpkPath, string chunkDirectory, string sourcePrefix, string outputPath)
@@ -458,6 +652,245 @@ namespace MgHachimiHotfix
             return result;
         }
 
+        private static List<VpkEntry> ParseTree(byte[] tree)
+        {
+            var entries = new List<VpkEntry>();
+            int position = 0;
+            string extension;
+            while ((extension = ReadCString(tree, ref position)).Length != 0)
+            {
+                string directory;
+                while ((directory = ReadCString(tree, ref position)).Length != 0)
+                {
+                    string fileName;
+                    while ((fileName = ReadCString(tree, ref position)).Length != 0)
+                    {
+                        Require(tree, position, 18);
+                        uint crc32 = ReadUInt32(tree, ref position);
+                        ushort preloadBytes = ReadUInt16(tree, ref position);
+                        ushort archiveIndex = ReadUInt16(tree, ref position);
+                        uint entryOffset = ReadUInt32(tree, ref position);
+                        uint entryLength = ReadUInt32(tree, ref position);
+                        ushort terminator = ReadUInt16(tree, ref position);
+                        if (terminator != ushort.MaxValue)
+                        {
+                            throw new InvalidDataException("Invalid VPK entry terminator.");
+                        }
+                        Require(tree, position, preloadBytes);
+                        var preload = new byte[preloadBytes];
+                        Buffer.BlockCopy(tree, position, preload, 0, preloadBytes);
+                        position += preloadBytes;
+
+                        entries.Add(new VpkEntry
+                        {
+                            Extension = extension,
+                            Directory = directory,
+                            FileName = fileName,
+                            Crc32 = crc32,
+                            Preload = preload,
+                            ArchiveIndex = archiveIndex,
+                            EntryOffset = entryOffset,
+                            EntryLength = entryLength
+                        });
+                    }
+                }
+            }
+            if (position != tree.Length)
+            {
+                throw new InvalidDataException("VPK tree has trailing or unparsed bytes.");
+            }
+            return entries;
+        }
+
+        private static byte[] SerializeTree(IList<VpkEntry> sourceEntries)
+        {
+            var entries = new List<VpkEntry>(sourceEntries);
+            entries.Sort(delegate(VpkEntry left, VpkEntry right)
+            {
+                int comparison = string.CompareOrdinal(left.Extension, right.Extension);
+                if (comparison != 0) return comparison;
+                comparison = string.CompareOrdinal(left.Directory, right.Directory);
+                if (comparison != 0) return comparison;
+                return string.CompareOrdinal(left.FileName, right.FileName);
+            });
+
+            using (var output = new MemoryStream())
+            using (var writer = new BinaryWriter(output, Encoding.UTF8, true))
+            {
+                string currentExtension = null;
+                string currentDirectory = null;
+                foreach (var entry in entries)
+                {
+                    if (!string.Equals(currentExtension, entry.Extension, StringComparison.Ordinal))
+                    {
+                        if (currentExtension != null)
+                        {
+                            WriteCString(writer, string.Empty); // End file names.
+                            WriteCString(writer, string.Empty); // End directories.
+                        }
+                        WriteCString(writer, entry.Extension);
+                        currentExtension = entry.Extension;
+                        currentDirectory = null;
+                    }
+                    if (!string.Equals(currentDirectory, entry.Directory, StringComparison.Ordinal))
+                    {
+                        if (currentDirectory != null)
+                        {
+                            WriteCString(writer, string.Empty); // End file names.
+                        }
+                        WriteCString(writer, entry.Directory);
+                        currentDirectory = entry.Directory;
+                    }
+
+                    WriteCString(writer, entry.FileName);
+                    writer.Write(entry.Crc32);
+                    writer.Write(checked((ushort)entry.Preload.Length));
+                    writer.Write(entry.ArchiveIndex);
+                    writer.Write(entry.EntryOffset);
+                    writer.Write(entry.EntryLength);
+                    writer.Write(ushort.MaxValue);
+                    writer.Write(entry.Preload);
+                }
+
+                if (currentExtension != null)
+                {
+                    WriteCString(writer, string.Empty); // End file names.
+                    WriteCString(writer, string.Empty); // End directories.
+                }
+                WriteCString(writer, string.Empty); // End extensions.
+                writer.Flush();
+                return output.ToArray();
+            }
+        }
+
+        private static VpkEntry CreateEntry(string relativePath)
+        {
+            string normalized = NormalizeRelativePath(relativePath);
+            int slash = normalized.LastIndexOf('/');
+            string directory = slash < 0 ? " " : normalized.Substring(0, slash);
+            string leafName = slash < 0 ? normalized : normalized.Substring(slash + 1);
+            int dot = leafName.LastIndexOf('.');
+            string extension = dot < 0 ? " " : leafName.Substring(dot + 1);
+            string fileName = dot < 0 ? leafName : leafName.Substring(0, dot);
+            if (fileName.Length == 0 || extension.Length == 0)
+            {
+                throw new InvalidDataException("Invalid overlay VPK path: " + relativePath);
+            }
+            return new VpkEntry
+            {
+                Extension = extension,
+                Directory = directory,
+                FileName = fileName,
+                Preload = new byte[0]
+            };
+        }
+
+        private static string GetEntryPath(VpkEntry entry)
+        {
+            string leafName = entry.Extension == " " ? entry.FileName : entry.FileName + "." + entry.Extension;
+            return entry.Directory == " " ? leafName : entry.Directory + "/" + leafName;
+        }
+
+        private static string NormalizeRelativePath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new InvalidDataException("Overlay VPK path is empty.");
+            }
+            string normalized = path.Replace('\\', '/').TrimStart('/');
+            if (normalized.Length == 0 || normalized.IndexOf(':') >= 0)
+            {
+                throw new InvalidDataException("Invalid overlay VPK path: " + path);
+            }
+            string[] parts = normalized.Split('/');
+            foreach (string part in parts)
+            {
+                if (part.Length == 0 || part == "." || part == "..")
+                {
+                    throw new InvalidDataException("Unsafe overlay VPK path rejected: " + path);
+                }
+            }
+            return string.Join("/", parts);
+        }
+
+        private static void WriteDirectoryVpk(string outputPath, byte[] tree)
+        {
+            byte[] treeHash;
+            byte[] emptyArchiveHash;
+            using (var md5 = MD5.Create())
+            {
+                treeHash = md5.ComputeHash(tree);
+                emptyArchiveHash = md5.ComputeHash(new byte[0]);
+            }
+
+            using (var output = new FileStream(outputPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
+            using (var writer = new BinaryWriter(output, Encoding.UTF8, false))
+            {
+                writer.Write(Magic);
+                writer.Write((uint)2);
+                writer.Write(checked((uint)tree.Length));
+                writer.Write((uint)0);  // Embedded data section size.
+                writer.Write((uint)0);  // Archive MD5 section size.
+                writer.Write((uint)48); // Other MD5 section size.
+                writer.Write((uint)20); // Source 2 empty signature header.
+                writer.Write(tree);
+                writer.Write(treeHash);
+                writer.Write(emptyArchiveHash);
+            }
+
+            byte[] fullHash;
+            using (var input = File.OpenRead(outputPath))
+            using (var md5 = MD5.Create())
+            {
+                fullHash = md5.ComputeHash(input);
+            }
+            using (var output = new FileStream(outputPath, FileMode.Append, FileAccess.Write, FileShare.Read))
+            using (var writer = new BinaryWriter(output, Encoding.UTF8, false))
+            {
+                writer.Write(fullHash);
+                writer.Write(Magic);
+                writer.Write((uint)1);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+                writer.Write((uint)0);
+            }
+        }
+
+        private static void WriteCString(BinaryWriter writer, string value)
+        {
+            writer.Write(Encoding.UTF8.GetBytes(value));
+            writer.Write((byte)0);
+        }
+
+        private static uint ComputeCrc32(Stream input)
+        {
+            uint crc = uint.MaxValue;
+            var buffer = new byte[1024 * 1024];
+            int read;
+            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                for (int index = 0; index < read; index++)
+                {
+                    crc ^= buffer[index];
+                    for (int bit = 0; bit < 8; bit++)
+                    {
+                        crc = (crc & 1) != 0 ? (crc >> 1) ^ 0xEDB88320u : crc >> 1;
+                    }
+                }
+            }
+            return ~crc;
+        }
+
+        private static void CopyToEnd(Stream input, Stream output)
+        {
+            var buffer = new byte[1024 * 1024];
+            int read;
+            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                output.Write(buffer, 0, read);
+            }
+        }
+
         private static int ReadCStringLength(byte[] data, ref int position)
         {
             int start = position;
@@ -580,6 +1013,18 @@ namespace MgHachimiHotfix
             public ushort Index;
             public string Path;
             public long Length;
+        }
+
+        private sealed class VpkEntry
+        {
+            public string Extension;
+            public string Directory;
+            public string FileName;
+            public uint Crc32;
+            public byte[] Preload;
+            public ushort ArchiveIndex;
+            public uint EntryOffset;
+            public uint EntryLength;
         }
     }
 }
