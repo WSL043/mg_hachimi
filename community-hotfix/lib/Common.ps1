@@ -6,12 +6,34 @@ $script:HotfixMarkerName = '.mg-hachimi-community-hotfix.json'
 $script:FeedbackUrl = 'https://github.com/WSL043/mg_hachimi/issues'
 $script:HotfixTranscriptStarted = $false
 
-function Get-HotfixLogRoot {
+function Get-HotfixDataRoot {
     $localData = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
     if ([string]::IsNullOrWhiteSpace($localData)) {
         $localData = [System.IO.Path]::GetTempPath()
     }
-    return (Join-Path $localData 'mg_hachimi_community_fix\logs')
+    return (Join-Path $localData 'mg_hachimi_community_fix')
+}
+
+function Get-HotfixLogRoot {
+    return (Join-Path (Get-HotfixDataRoot) 'logs')
+}
+
+function Get-HotfixStatePath {
+    return (Join-Path (Get-HotfixDataRoot) ('state\{0}.json' -f $script:WorkshopItemId))
+}
+
+function Get-HotfixBackupRoot {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$SourceFiles
+    )
+
+    $directoryRecord = @($SourceFiles | Where-Object { [string]$_.path -like '*_dir.vpk' })
+    if ($directoryRecord.Count -ne 1) {
+        throw 'Package source file list does not contain exactly one directory VPK.'
+    }
+    $hashPrefix = ([string]$directoryRecord[0].sha256).Substring(0, 16).ToUpperInvariant()
+    return (Join-Path (Get-HotfixDataRoot) ('backups\{0}\original-{1}' -f $script:WorkshopItemId, $hashPrefix))
 }
 
 function Start-HotfixLog {
@@ -133,8 +155,8 @@ function Resolve-HotfixEnvironment {
     Add-UniquePath -List $gameCandidates -Path $GameRoot
 
     try {
-        $cs2Process = Get-Process -Name 'cs2' -ErrorAction Stop | Select-Object -First 1
-        if ($cs2Process.Path) {
+        $cs2Process = @([System.Diagnostics.Process]::GetProcessesByName('cs2')) | Select-Object -First 1
+        if ($cs2Process -and $cs2Process.Path) {
             $runningGameRoot = $cs2Process.Path
             for ($i = 0; $i -lt 4; $i++) {
                 $runningGameRoot = Split-Path -Parent $runningGameRoot
@@ -143,7 +165,7 @@ function Resolve-HotfixEnvironment {
         }
     }
     catch {
-        # CS2 does not have to be running.
+        # CS2 does not have to be running, and its path may be unavailable.
     }
 
     $steamRoots = @(Get-SteamInstallRoots)
@@ -220,6 +242,157 @@ function Write-Utf8Json {
     $json = $Value | ConvertTo-Json -Depth 10
     $utf8 = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($Path, $json, $utf8)
+}
+
+function Get-DirectFilePath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Root,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RecordedPath
+    )
+
+    if ([string]::IsNullOrWhiteSpace($RecordedPath) -or [System.IO.Path]::GetFileName($RecordedPath) -ne $RecordedPath) {
+        throw "Unsafe direct file path rejected: $RecordedPath"
+    }
+    return (Join-Path ([System.IO.Path]::GetFullPath($Root)) $RecordedPath)
+}
+
+function Test-RecordedFileSet {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Root,
+
+        [Parameter(Mandatory = $true)]
+        [object[]]$Files
+    )
+
+    foreach ($entry in $Files) {
+        $path = Get-DirectFilePath -Root $Root -RecordedPath ([string]$entry.path)
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+            return $false
+        }
+        $file = Get-Item -LiteralPath $path
+        if ($file.Length -ne [int64]$entry.length) {
+            return $false
+        }
+        $hash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
+        if (-not [string]::Equals($hash, [string]$entry.sha256, [System.StringComparison]::OrdinalIgnoreCase)) {
+            return $false
+        }
+    }
+    return $true
+}
+
+function Copy-RecordedFileSet {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$SourceRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DestinationRoot,
+
+        [Parameter(Mandatory = $true)]
+        [object[]]$Files
+    )
+
+    New-Item -ItemType Directory -Path $DestinationRoot -Force | Out-Null
+    foreach ($entry in $Files) {
+        $sourcePath = Get-DirectFilePath -Root $SourceRoot -RecordedPath ([string]$entry.path)
+        $destinationPath = Get-DirectFilePath -Root $DestinationRoot -RecordedPath ([string]$entry.path)
+        if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
+            throw "Source file is missing: $sourcePath"
+        }
+        Copy-Item -LiteralPath $sourcePath -Destination $destinationPath -Force
+    }
+    if (-not (Test-RecordedFileSet -Root $DestinationRoot -Files $Files)) {
+        throw "Copied file-set verification failed: $DestinationRoot"
+    }
+}
+
+function Set-RecordedFileSet {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$SourceRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DestinationRoot,
+
+        [Parameter(Mandatory = $true)]
+        [object[]]$Files
+    )
+
+    $token = [guid]::NewGuid().ToString('N')
+    $pending = New-Object 'System.Collections.Generic.List[object]'
+    $swapped = New-Object 'System.Collections.Generic.List[object]'
+
+    try {
+        foreach ($entry in $Files) {
+            $name = [string]$entry.path
+            $sourcePath = Get-DirectFilePath -Root $SourceRoot -RecordedPath $name
+            $destinationPath = Get-DirectFilePath -Root $DestinationRoot -RecordedPath $name
+            if (-not (Test-Path -LiteralPath $destinationPath -PathType Leaf)) {
+                throw "Workshop file is missing: $destinationPath"
+            }
+
+            $destinationFile = Get-Item -LiteralPath $destinationPath
+            if ($destinationFile.Length -eq [int64]$entry.length) {
+                $destinationHash = (Get-FileHash -LiteralPath $destinationPath -Algorithm SHA256).Hash
+                if ([string]::Equals($destinationHash, [string]$entry.sha256, [System.StringComparison]::OrdinalIgnoreCase)) {
+                    continue
+                }
+            }
+
+            $temporaryPath = $destinationPath + '.community-hotfix-new-' + $token
+            $swapPath = $destinationPath + '.community-hotfix-old-' + $token
+            Copy-Item -LiteralPath $sourcePath -Destination $temporaryPath
+            $temporaryFile = Get-Item -LiteralPath $temporaryPath
+            $temporaryHash = (Get-FileHash -LiteralPath $temporaryPath -Algorithm SHA256).Hash
+            if ($temporaryFile.Length -ne [int64]$entry.length -or -not [string]::Equals($temporaryHash, [string]$entry.sha256, [System.StringComparison]::OrdinalIgnoreCase)) {
+                throw "Staged file verification failed: $name"
+            }
+            $pending.Add([pscustomobject]@{ Name = $name; TemporaryPath = $temporaryPath; DestinationPath = $destinationPath; SwapPath = $swapPath })
+        }
+
+        foreach ($item in $pending) {
+            [System.IO.File]::Replace($item.TemporaryPath, $item.DestinationPath, $item.SwapPath)
+            $swapped.Add($item)
+        }
+
+        if (-not (Test-RecordedFileSet -Root $DestinationRoot -Files $Files)) {
+            throw 'Installed Workshop file-set verification failed.'
+        }
+
+        foreach ($item in $swapped) {
+            if (Test-Path -LiteralPath $item.SwapPath -PathType Leaf) {
+                Remove-Item -LiteralPath $item.SwapPath -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+    catch {
+        for ($index = $swapped.Count - 1; $index -ge 0; $index--) {
+            $item = $swapped[$index]
+            try {
+                if (Test-Path -LiteralPath $item.SwapPath -PathType Leaf) {
+                    $failedPath = $item.DestinationPath + '.community-hotfix-failed-' + $token
+                    [System.IO.File]::Replace($item.SwapPath, $item.DestinationPath, $failedPath)
+                    if (Test-Path -LiteralPath $failedPath -PathType Leaf) {
+                        Remove-Item -LiteralPath $failedPath -Force
+                    }
+                }
+            }
+            catch {
+                # Preserve the original error. Diagnostics will report any leftover swap files.
+            }
+        }
+        foreach ($item in $pending) {
+            if (Test-Path -LiteralPath $item.TemporaryPath -PathType Leaf) {
+                Remove-Item -LiteralPath $item.TemporaryPath -Force
+            }
+        }
+        throw
+    }
 }
 
 function Get-FileRecord {

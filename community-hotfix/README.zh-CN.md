@@ -1,52 +1,57 @@
 # mg_hachimi 社区兼容修复包（测试版）
 
-这是原项目公开 Fork 中的非官方临时维护补丁，不代表原作者官方接管。它用于修复 CS2 更新后《哈基米：神人地图》的兼容问题，包括靶子运动、靶子朝向与露出高度、歌曲列表滚动与重叠文字、小电视歌名以及调试文字泄漏。
+这是面向 Workshop 项目 `3500104891` 的非官方、临时玩家维护包。它用于修复 CS2 更新后的兼容问题，不要求玩家再订阅一份重复地图，也不代表原作者官方接管。
 
-## 安全与回退方式
+## 修复内容
 
-- 不改动 `Steam\steamapps\workshop\content\730\3500104891` 下的原始 Workshop 文件。
-- 不关闭、不欺骗也不绕过 Steam 完整性验证。
-- 安装器从玩家本机已经下载的 Workshop 项目只读提取资源到独立 addon `mg_hachimi_community_fix`，再覆盖最小修复文件。它不会创建或挂载根 `pak01.vpk`，因此不会触发 `Failed to load file (unexpected)!`。
-- `Uninstall.cmd` 只会删除带有本补丁专用标记的独立 addon。卸载后从创意工坊正常启动，就是作者原版。
-- 作者更新后，建议先运行 `Uninstall.cmd`，让 Steam 更新 Workshop，再测试作者版本；如果作者版本仍有问题，可以重新安装补丁。
+- AnimGraph2 更新后靶子重新沿轨道下降。
+- 靶子保持直立、完整露出，并且判定与可见模型对齐。
+- 歌单滚动位置、显示行和射击判定区重新对齐，不再叠加谱师或调试小字。
+- 小电视显示干净的歌曲名。
+- 判定提示改为明确启用与禁用，避免显示异常。
 
-## 使用条件
+## 直接修补 Workshop 的方式
 
-1. 已订阅并完整下载 Workshop 项目 `3500104891`。
-2. Steam 和 CS2 已安装；首次测试建议先关闭 CS2。
-3. 当前测试启动方式使用 CS2 Workshop Tools 的 `-tools -addon` 模式。
+- 安装器只接受清单中精确匹配的作者版 Workshop VPK，不会对未知版本盲目打补丁。
+- 修改前会把完整作者版备份到 `%LOCALAPPDATA%\mg_hachimi_community_fix\backups`，并逐个校验长度和 SHA-256。
+- 安装器从已验证备份重建分卷 VPK，追加所选修复资源；完整输出与清单一致后，只替换哈希确实变化的文件。
+- `Uninstall.cmd` 会恢复已验证的作者版。如果 Steam 已经下载了未知或更新后的版本，卸载器不会用旧备份覆盖它。
+- 本包不会关闭或绕过 Steam 完整性机制。Workshop 更新、Steam 验证完整性、退订重订都可能恢复作者文件。
 
-## 一键使用
+正常情况下只需安装一次。每次运行 `Launch.cmd` 只进行快速哈希检查，不会重复写入 242MB 文件；如果检测到 Steam 恰好恢复为本包支持的作者版，就只在这一次自动补回上次选择的版本。遇到未知版本时会停止并要求生成诊断，不会强行覆盖。
 
-- 双击 `Install.cmd`：显示安装选项。
-- 双击 `Install-FixOnly.cmd`：只安装兼容修复（当前推荐）。
-- 双击 `Install-FixPlusSongs.cmd`：兼容修复加抢先歌曲模块；当前包含上游 Issue #46 与 #49 的两首投稿。
-- 双击 `Launch.cmd`：通过 Steam 挂载独立 addon 并启动地图。
-- 启动时 Workshop Tools 的 Asset Browser 可能盖在游戏窗口上；看到它并不代表卡住，切回“Counter-Strike 2”窗口即可。首次提取后的第一次进图可能需要等待数秒。
-- 双击 `Diagnostics.cmd`：检查安装、Workshop 原文件、补丁哈希和运行环境，并生成可直接上传到 Issue 的诊断 ZIP。
-- 双击 `Uninstall.cmd`：移除独立 addon，回到 Workshop 作者版。
+重复运行安装器并选择同一个版本也不会重打：它会识别完整补丁哈希，跳过 VPK 重建和文件写入。
 
-安装过程会额外占用约 253MB 磁盘空间，因为它会把本机 Workshop 分卷提取为独立 addon；抢先歌曲模块另外约 6.6MB。修复包下载本身不包含作者的完整地图资源。
+## 一键命令
 
-如果安装、启动或游戏显示异常，请先运行 `Diagnostics.cmd`，然后在 `https://github.com/WSL043/mg_hachimi/issues` 新建 Issue，并附上它生成的 `diagnostics-bundle-*.zip`。
+- `Install.cmd`：交互选择“只修复”或“修复＋抢先歌曲”。
+- `Install-FixOnly.cmd`：只安装兼容修复。
+- `Install-FixPlusSongs.cmd`：兼容修复加可选抢先歌曲包。
+- `Launch.cmd`：选择国服或国际服，校验补丁并在普通 CS2 中载入原创意工坊地图。
+- `Launch-PerfectWorld.cmd`：直接以 Perfect World／国服模式启动。
+- `Launch-Worldwide.cmd`：直接以 Worldwide／Steam 国际服模式启动。
+- `Diagnostics.cmd`：检查包体、Workshop、备份、状态和运行环境，并生成可上传到 Issue 的 ZIP。
+- `Uninstall.cmd`：恢复已验证的 Workshop 作者版。
 
-## 为什么不直接重传完整地图
+启动器不使用 `-tools` 和 `-addon`，只会出现普通 Counter-Strike 2 游戏窗口。由于本地 Workshop 文件经过修改，启动器会使用 `-insecure`；不要从该次会话进入匹配。需要匹配时先关闭 CS2，再从 Steam 正常启动。
 
-仓库目前没有覆盖全部地图素材的明确许可证。复制玩家本机已订阅内容并应用最小修复，可以避免把原作者的完整音乐、模型和贴图重新打包发布，也能保留正常的 Steam Workshop 更新与校验流程。
+永久额外占用约为：作者版回退备份 242MB，加上 Workshop 中“只修复”约 18MB或“修复＋歌曲”约 25MB 的增量。安装时的临时构建目录会自动清理；下载包本身不重新分发作者的完整地图。
 
-## 抢先歌曲模块
+## 抢先歌曲包
 
-Issue 中投稿、且尚未进入作者版本的新谱面会去重后加入可选抢先模块，保留投稿者、原 Issue、谱面与素材来源署名。抢先模块保持非官方、非商业、可单独安装；投稿者或相关权利人提出移除时会及时下架。基础“仅修复”版不包含新增歌曲。
+当前可选包 `2026.07.18.1` 包含：
 
-当前抢先包 `2026.07.18.1` 包含：
+- **A World I Built For You**：投稿者 `RTX9999ti`，[上游 Issue #46](https://github.com/GEEKiDoS/mg_hachimi/issues/46)。
+- **Unwelcome ChiMi**：投稿者 `LYarHlXS`，谱师标注 `[LNBXS] HD(Hard)`，[上游 Issue #49](https://github.com/GEEKiDoS/mg_hachimi/issues/49)。
 
-- `A World I Built For You`：投稿者 `RTX9999ti`，上游 Issue #46。
-- `Unwelcome ChiMi`：投稿者 `LYarHlXS`，谱师标注 `[LNBXS] HD(Hard)`，上游 Issue #49。
+如果投稿以后进入作者版或后续维护版，会从抢先包中去重，避免重复歌曲。
 
-当前版本：`0.1.0-test.1`
+## 问题反馈
 
-## 上游回归与交接
+先运行 `Diagnostics.cmd`，再到 `https://github.com/WSL043/mg_hachimi/issues` 新建 Issue，描述看见的问题和触发前的操作，并附上生成的 `diagnostics-bundle-*.zip`。诊断包只含日志、哈希和环境信息，不包含完整地图。
 
-- 所有修复保留原作者署名与 Git 历史，能独立提交的修改优先向上游发 PR。
-- 原作者恢复维护并发布可用 Workshop 版本后，本补丁会停止扩展对应兼容修复，并引导玩家卸载、回到作者版本。
-- 新谱面只进入可选模块，不改变“仅修复”版本；一旦上游正式收录，就从抢先模块去重或改为跟随上游。
+## 与作者版本的关系
+
+原作者已经说明不再继续更新当前 CS2 地图，明确允许发布 Workshop fork，并正在制作一个带 Workshop 功能的免费独立 Steam 游戏。本包仍明确标记为非官方玩家维护；如果以后出现作者维护版本，运行 `Uninstall.cmd` 即可恢复并回归作者版。
+
+当前测试版本：`0.1.0-test.2`
