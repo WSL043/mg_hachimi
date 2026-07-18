@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packageVersion": "0.1.0-test.1",
+  "addonName": "mg_hachimi_community_fix",
+  "workshopItemId": "3500104891",
+  "baseFiles": [
+    {
+      "path": "maps/mg_hachimi.vpk",
+      "length": 18056148,
+      "sha256": "8AFDA7DE9399E14A1ADC93D493A1A021D94015094B6A576E83EA7B328EB03FA6"
+    },
+    {
+      "path": "maps/scripts/main.vjs_c",
+      "length": 33886,
+      "sha256": "7E33D48F8B54773503E05AE8B9FD516E2CE7E2B42C59710CFCB09E0D16D1A3AE"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { Instance } from "cs_script/point_script";
+import { BaseModelEntity, Instance } from "cs_script/point_script";
 import { Chart, charts, NoteData } from '../src/musics';
 import { C, JudgeOpt, Opt } from "./constants";
 import { SoundEffect, createSoundEvent } from "./utils/sound";
@@ -395,6 +395,7 @@ export class HachimiGame {
     hitmarkerController: HitmarkerController = new HitmarkerController("hitmarker_particle");
     headshotHitmarkerController: HitmarkerController = new HitmarkerController("hitmarker_particle_headshot");
     _soundPlayer: SoundEffect | undefined;
+    _progressBar: BaseModelEntity | undefined;
 
     constructor() {
         this.postInited = true;
@@ -932,11 +933,14 @@ export class HachimiGame {
         });
 
         const progress = (this.noteProgress + 1) / this.music.chart.NoteDataList.length;
-        Instance.EntFireAtName({
-            name: "pulseent",
-            input: "SetProgressBar",
-            value: progress,
-        });
+        if (!this._progressBar?.IsValid()) {
+            this._progressBar = Instance.FindEntityByName("progress_bar") as BaseModelEntity | undefined;
+        }
+
+        // The legacy Progress AnimGraph no longer instantiates after the
+        // AnimGraph2 update. Preserve a visible completion indicator without
+        // sending the now-invalid Pulse parameter on every judgement.
+        this._progressBar?.SetModelScale(0.8 * Math.min(Math.max(progress, 0.001), 1));
     }
 
     updateMusic() {
@@ -948,7 +952,12 @@ export class HachimiGame {
         Instance.EntFireAtName({
             name: "song_current_bv",
             input: "SetMessage",
-            value: this.music.bv,
+            value: this.music.name,
+        });
+        Instance.EntFireAtName({
+            name: "song_current_bv",
+            input: "SetScale",
+            value: Math.min(1, 14 / Math.max(this.music.name.length, 1)),
         });
     }
 

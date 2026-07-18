@@ -516,4 +516,18 @@
 		use_hrtf = 0.0
 		vsnd_files = "sounds/scroll.vsnd"
 	}
+
+	"music.a_world_i_built_for_you" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		vsnd_files = "sounds/songs/a_world_i_built_for_you.vsnd"
+	}
+
+	"music.unwelcome_chimi" =
+	{
+		type = "csgo_music"
+		use_hrtf = 0.0
+		vsnd_files = "sounds/songs/unwelcome_chimi.vsnd"
+	}
 }

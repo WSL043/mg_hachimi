@@ -1,0 +1,92 @@
+{
+    "schemaVersion":  1,
+    "id":  "issue-preview-songs",
+    "version":  "2026.07.18.1",
+    "label":  "Issue preview songs (#46 and #49)",
+    "sources":  [
+                    {
+                        "issue":  46,
+                        "title":  "A World I Built For You",
+                        "submitter":  "RTX9999ti",
+                        "url":  "https://github.com/GEEKiDoS/mg_hachimi/issues/46"
+                    },
+                    {
+                        "issue":  49,
+                        "title":  "Unwelcome ChiMi",
+                        "submitter":  "LYarHlXS",
+                        "url":  "https://github.com/GEEKiDoS/mg_hachimi/issues/49"
+                    }
+                ],
+    "files":  [
+                  {
+                      "path":  "cfg/_m_71.cfg",
+                      "length":  27323,
+                      "sha256":  "31E3146299AA7C820F9F66F6495259D17716E2B5B06B7A4C22E1704BBD2CA6ED"
+                  },
+                  {
+                      "path":  "cfg/_m_72.cfg",
+                      "length":  26768,
+                      "sha256":  "EF7B796A2DF5219BF119E0F28EC73556B542FEF551F84F3D13F0BF90247C85F9"
+                  },
+                  {
+                      "path":  "sounds/songs/a_world_i_built_for_you.vsnd_c",
+                      "length":  3312131,
+                      "sha256":  "82DE9FFCA06B8170F4075DD386244C09792A25DCF82B51D6433923DA10AD44C9"
+                  },
+                  {
+                      "path":  "sounds/songs/unwelcome_chimi.vsnd_c",
+                      "length":  2092605,
+                      "sha256":  "93EE1CB267FAF168F806BE364EDAEF7E9D8D3C670A28655430FA199FCB89CCD8"
+                  },
+                  {
+                      "path":  "soundevents/soundevents_addon.vsndevts_c",
+                      "length":  7217,
+                      "sha256":  "01FC16F09708119E20A8590680EF5CDD726EE74CFA505D7B6CC06D3934B35260"
+                  },
+                  {
+                      "path":  "models/song_monitor_01.vmdl_c",
+                      "length":  48692,
+                      "sha256":  "E7A35E2C8E5DCB5D49C5E7195A2208A8EAEE3BF865B83AA1723D1F0D339A65DF"
+                  },
+                  {
+                      "path":  "materials/covers/a_world_i_built_for_you.vmat_c",
+                      "length":  4260,
+                      "sha256":  "28098818397FC6D192076EA797A930867791FE705FC4FF1285173E7F8A019792"
+                  },
+                  {
+                      "path":  "materials/covers/a_world_i_built_for_you_png_62ba164b.vtex_c",
+                      "length":  199537,
+                      "sha256":  "2856600136AB835ECC50CAC99F50E3B2209A48F1F584B1A2BB95B99963E08032"
+                  },
+                  {
+                      "path":  "materials/covers/a_world_i_built_for_you_vmat_g_tlayer0mask_1cbd025c.vtex_c",
+                      "length":  1992,
+                      "sha256":  "E39260855912F25E9AE312154EB716F57D080F49274DE3443164AA72BA3C5529"
+                  },
+                  {
+                      "path":  "materials/covers/a_world_i_built_for_you_vmat_g_tlayer2color_6b6e411d.vtex_c",
+                      "length":  1992,
+                      "sha256":  "54C4FE78D9E7D01A3B1C088BC3180D549E51E982BDC6029D10D986591FAA6CBC"
+                  },
+                  {
+                      "path":  "materials/covers/unwelcome_chimi.vmat_c",
+                      "length":  4212,
+                      "sha256":  "73E007DDA694F3627D6904B295609E5A359E34221B1FDF231F824FAB6662A37A"
+                  },
+                  {
+                      "path":  "materials/covers/unwelcome_chimi_jpg_db0ff89d.vtex_c",
+                      "length":  879685,
+                      "sha256":  "02A0C0298F0858534631FCCD948E43B14695A1FA55D2E686FFDE98519050BF0A"
+                  },
+                  {
+                      "path":  "materials/covers/unwelcome_chimi_vmat_g_tlayer0mask_1cbd025c.vtex_c",
+                      "length":  1992,
+                      "sha256":  "E39260855912F25E9AE312154EB716F57D080F49274DE3443164AA72BA3C5529"
+                  },
+                  {
+                      "path":  "materials/covers/unwelcome_chimi_vmat_g_tlayer2color_6b6e411d.vtex_c",
+                      "length":  1992,
+                      "sha256":  "54C4FE78D9E7D01A3B1C088BC3180D549E51E982BDC6029D10D986591FAA6CBC"
+                  }
+              ]
+}
